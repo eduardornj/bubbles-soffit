@@ -1,0 +1,1 @@
+import"./hoisted.DV8WBEkX.js";if(window.location.search||window.location.hash){const e=new URL(window.location);e.search="",e.hash="",window.history.replaceState({},document.title,e.pathname)}const e=document.createElement("meta");e.name="referrer",e.content="no-referrer",document.head.appendChild(e);

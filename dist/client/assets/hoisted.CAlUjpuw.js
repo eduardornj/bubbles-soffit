@@ -1,0 +1,1 @@
+import"./hoisted.DV8WBEkX.js";if(window.location.search||window.location.hash){const o=new URL(window.location);o.search="",o.hash="",window.history.replaceState({},document.title,o.pathname)}const o=window.location.pathname;(o.includes("../")||o.includes("..\\")||o.includes("%2e%2e"))&&window.history.replaceState({},document.title,"/404");

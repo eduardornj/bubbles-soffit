@@ -1,0 +1,25 @@
+<svg width="800" height="600" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background with rounded corners -->
+  <rect width="800" height="600" rx="80" fill="#2563eb"/>
+  
+  <!-- Main bubble (larger) -->
+  <circle cx="400" cy="200" r="80" fill="white" opacity="0.8"/>
+  
+  <!-- Left bubble -->
+  <circle cx="250" cy="350" r="60" fill="white" opacity="0.6"/>
+  
+  <!-- Right bubble -->
+  <circle cx="550" cy="350" r="60" fill="white" opacity="0.6"/>
+  
+  <!-- Bottom center bubble -->
+  <circle cx="400" cy="450" r="40" fill="white" opacity="0.4"/>
+  
+  <!-- Additional small bubbles for effect -->
+  <circle cx="150" cy="250" r="25" fill="white" opacity="0.3"/>
+  <circle cx="650" cy="250" r="25" fill="white" opacity="0.3"/>
+  <circle cx="300" cy="500" r="20" fill="white" opacity="0.2"/>
+  <circle cx="500" cy="500" r="20" fill="white" opacity="0.2"/>
+  
+  <!-- Company text "BE" (Bubbles Enterprise) -->
+  <text x="400" y="550" text-anchor="middle" fill="white" font-size="120" font-family="Arial, sans-serif" font-weight="bold">BE</text>
+</svg>

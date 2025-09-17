@@ -1,0 +1,226 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// Security headers for error pages
+Astro.response.headers.set('X-Content-Type-Options', 'nosniff');
+Astro.response.headers.set('X-Frame-Options', 'DENY');
+Astro.response.headers.set('X-XSS-Protection', '1; mode=block');
+Astro.response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+Astro.response.headers.set('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self';");
+Astro.response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+Astro.response.headers.set('Accept', 'application/json, application/xml, text/html, text/plain, multipart/form-data');
+
+// Set proper status code
+Astro.response.status = 415;
+---
+
+<BaseLayout 
+  title="415 - Unsupported Media Type | Bubbles Enterprise"
+  description="The media format of the requested data is not supported by the server. Please check your content type."
+>
+  <main class="min-h-screen bg-gradient-to-br from-purple-500/5 via-white to-blue-500/5 flex items-center justify-center px-4">
+    <div class="max-w-2xl mx-auto text-center">
+      <!-- Error Icon -->
+      <div class="mb-8">
+        <div class="w-32 h-32 mx-auto bg-gradient-to-br from-purple-500 to-blue-600 rounded-full flex items-center justify-center shadow-2xl animate-pulse-glow">
+          <svg class="w-16 h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Error Content -->
+      <div class="glass-hover rounded-3xl p-8 mb-8">
+        <h1 class="text-6xl font-display font-bold text-purple-600 mb-4">415</h1>
+        <h2 class="text-3xl font-display font-semibold text-neutral-gray-800 mb-4">Unsupported Media Type</h2>
+        <p class="text-lg text-neutral-gray-600 mb-6 leading-relaxed">
+          The media format of the requested data is not supported by the server for the requested resource and method. 
+          Please check your content type and try again.
+        </p>
+        
+        <!-- Security Notice -->
+        <div class="bg-purple-50 border border-purple-200 rounded-2xl p-4 mb-6">
+          <div class="flex items-center space-x-2">
+            <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+            </svg>
+            <p class="text-sm text-purple-800 font-medium">Media Type Security</p>
+          </div>
+          <p class="text-sm text-purple-700 mt-2">
+            Only approved media types are accepted to prevent malicious file uploads and security vulnerabilities.
+          </p>
+        </div>
+
+        <!-- Supported Media Types -->
+        <div class="bg-green-50 border border-green-200 rounded-2xl p-4 mb-6">
+          <h3 class="text-sm font-semibold text-green-800 mb-3">Supported Media Types:</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+            <div class="space-y-1">
+              <div class="font-medium text-green-800">Documents:</div>
+              <div class="text-green-700">application/json</div>
+              <div class="text-green-700">application/xml</div>
+              <div class="text-green-700">text/html</div>
+              <div class="text-green-700">text/plain</div>
+            </div>
+            <div class="space-y-1">
+              <div class="font-medium text-green-800">Forms & Files:</div>
+              <div class="text-green-700">multipart/form-data</div>
+              <div class="text-green-700">application/x-www-form-urlencoded</div>
+              <div class="text-green-700">image/jpeg, image/png</div>
+              <div class="text-green-700">application/pdf</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center mb-6">
+          <a href="/" class="btn-primary inline-flex items-center space-x-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+            </svg>
+            <span>Return Home</span>
+          </a>
+          <a href="/api-docs" class="btn-secondary inline-flex items-center space-x-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <span>API Documentation</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Common Issues -->
+      <div class="text-center">
+        <h3 class="text-xl font-display font-semibold text-neutral-gray-800 mb-4">Common Issues</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="glass-hover rounded-2xl p-4">
+            <svg class="w-8 h-8 text-bubble-primary mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m0 0V1a1 1 0 011-1h2a1 1 0 011 1v18a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1h2a1 1 0 011-1z"></path>
+            </svg>
+            <h4 class="font-semibold text-neutral-gray-800 mb-2">Wrong Content-Type</h4>
+            <p class="text-sm text-neutral-gray-600">Check that your Content-Type header matches your actual data format.</p>
+          </div>
+          
+          <div class="glass-hover rounded-2xl p-4">
+            <svg class="w-8 h-8 text-bubble-primary mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+            </svg>
+            <h4 class="font-semibold text-neutral-gray-800 mb-2">Unsupported Format</h4>
+            <p class="text-sm text-neutral-gray-600">The file format you're trying to upload is not allowed for security reasons.</p>
+          </div>
+          
+          <div class="glass-hover rounded-2xl p-4">
+            <svg class="w-8 h-8 text-bubble-primary mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+            <h4 class="font-semibold text-neutral-gray-800 mb-2">Need Help?</h4>
+            <p class="text-sm text-neutral-gray-600">Contact our API support team at (407) 715-1790 for assistance.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</BaseLayout>
+
+<script>
+  // Security: Log unsupported media type for monitoring
+  console.warn('415 Unsupported Media Type - Invalid content type detected');
+  
+  // Security: Get content type information if available
+  const contentType = document.querySelector('meta[name="content-type"]')?.content || 'unknown';
+  console.warn(`Rejected content type: ${contentType}`);
+  
+  // Security: Clear any potentially malicious file uploads from memory
+  const fileInputs = document.querySelectorAll('input[type="file"]');
+  fileInputs.forEach(input => {
+    input.value = '';
+    input.files = null;
+  });
+  
+  // Security: Clear any cached content with unsupported media types
+  if ('caches' in window) {
+    caches.keys().then(names => {
+      names.forEach(name => {
+        caches.open(name).then(cache => {
+          cache.keys().then(requests => {
+            requests.forEach(request => {
+              const contentType = request.headers.get('content-type');
+              if (contentType && !isSupportedMediaType(contentType)) {
+                cache.delete(request);
+              }
+            });
+          });
+        });
+      });
+    });
+  }
+  
+  // Security: Function to check if media type is supported
+  function isSupportedMediaType(mediaType) {
+    const supportedTypes = [
+      'application/json',
+      'application/xml',
+      'text/html',
+      'text/plain',
+      'multipart/form-data',
+      'application/x-www-form-urlencoded',
+      'image/jpeg',
+      'image/png',
+      'image/gif',
+      'application/pdf'
+    ];
+    
+    return supportedTypes.some(type => mediaType.toLowerCase().includes(type));
+  }
+  
+  // Security: Monitor and block unsupported file types
+  document.addEventListener('change', (e) => {
+    if (e.target.type === 'file' && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      if (!isSupportedMediaType(file.type)) {
+        e.target.value = '';
+        console.warn(`Blocked unsupported file type: ${file.type}`);
+        alert('This file type is not supported for security reasons.');
+      }
+    }
+  });
+  
+  // Security: Clear any stored content with unsupported types
+  try {
+    const storageKeys = Object.keys(localStorage);
+    storageKeys.forEach(key => {
+      if (key.includes('content-type') || key.includes('media-type')) {
+        const value = localStorage.getItem(key);
+        if (value && !isSupportedMediaType(value)) {
+          localStorage.removeItem(key);
+        }
+      }
+    });
+    
+    const sessionKeys = Object.keys(sessionStorage);
+    sessionKeys.forEach(key => {
+      if (key.includes('content-type') || key.includes('media-type')) {
+        const value = sessionStorage.getItem(key);
+        if (value && !isSupportedMediaType(value)) {
+          sessionStorage.removeItem(key);
+        }
+      }
+    });
+  } catch (e) {
+    // Storage access might be restricted
+  }
+  
+  // Security: Override fetch to validate content types
+  const originalFetch = window.fetch;
+  window.fetch = function(resource, options = {}) {
+    if (options.headers) {
+      const contentType = options.headers['Content-Type'] || options.headers['content-type'];
+      if (contentType && !isSupportedMediaType(contentType)) {
+        console.warn(`Blocked fetch request with unsupported content type: ${contentType}`);
+        return Promise.reject(new Error('Unsupported media type'));
+      }
+    }
+    return originalFetch.apply(this, arguments);
+  };
+</script>

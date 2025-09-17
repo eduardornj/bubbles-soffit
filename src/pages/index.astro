@@ -1,0 +1,353 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ServicesSection from '../components/ServicesSection.astro';
+import ModernCarousel from '../components/ModernCarousel.astro';
+import FeaturedChatBotWrapper from '../components/FeaturedChatBotWrapper.astro';
+import ServiceModalWrapper from '../components/ServiceModalWrapper.astro';
+---
+
+<BaseLayout 
+  title="Bubbles Enterprise - #1 Soffit & Fascia Contractors Orlando FL | Free Estimates"
+  description="Top-rated soffit & fascia installation, repair & replacement in Orlando, FL. Licensed contractors with 10+ years experience. Free estimates, 100% satisfaction guarantee. Call (407) 715-1790!"
+  keywords="soffit installation Orlando, fascia repair Orlando FL, aluminum soffit contractors, vinyl soffit installation, Orlando home improvement, fascia replacement Florida, licensed soffit contractors, Orlando construction services"
+  transparentHeader={true}
+>
+  <!-- Hero Section -->
+  <section id="home" class="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <!-- Background Gradient -->
+    <div class="absolute inset-0 gradient-blue"></div>
+    
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 opacity-10">
+      <svg class="w-full h-full" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
+            <path d="M 10 0 L 0 0 0 10" fill="none" stroke="white" stroke-width="0.5"/>
+          </pattern>
+        </defs>
+        <rect width="100" height="100" fill="url(#grid)" />
+      </svg>
+    </div>
+    
+    <!-- Floating Elements -->
+    <div class="absolute top-20 left-10 w-20 h-20 bg-white/10 rounded-full animate-float"></div>
+    <div class="absolute top-40 right-20 w-16 h-16 bg-white/10 rounded-full animate-float" style="animation-delay: 1s;"></div>
+    <div class="absolute bottom-40 left-20 w-12 h-12 bg-white/10 rounded-full animate-float" style="animation-delay: 2s;"></div>
+    
+    <!-- Hero Content -->
+    <div class="relative z-10 container-custom text-center text-white">
+      <!-- Main Logo Typography -->
+      <div class="mb-8 animate-fade-in">
+        <h1 class="font-display font-bold text-6xl md:text-8xl lg:text-9xl mb-4">
+          <span class="block text-white">Bubbles</span>
+          <span class="block text-bubble-light text-5xl md:text-7xl lg:text-8xl -mt-4">Enterprise</span>
+        </h1>
+        <div class="w-32 h-1 bg-bubble-light mx-auto rounded-full"></div>
+      </div>
+      
+      <!-- Tagline -->
+      <div class="mb-12 animate-slide-up" style="animation-delay: 0.3s;">
+        <p class="text-xl md:text-2xl lg:text-3xl font-light text-bubble-light mb-4">
+          Soffit & Fascia Specialists
+        </p>
+        <p class="text-lg md:text-xl text-white/90 max-w-2xl mx-auto">
+          Professional construction services in Orlando, FL and surrounding areas throughout Central Florida. Quality workmanship with guaranteed results.
+        </p>
+      </div>
+      
+      <!-- CTA Buttons -->
+      <div class="flex flex-col sm:flex-row gap-4 justify-center items-center animate-slide-up" style="animation-delay: 0.6s;">
+        <a href="/quote" class="btn bg-white text-bubble-blue hover:bg-bubble-light hover:text-bubble-dark px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
+          Get Free Quote
+        </a>
+        <a href="/calculator" class="btn bg-transparent text-white border-2 border-white hover:bg-white hover:text-bubble-blue px-8 py-4 text-lg font-semibold transition-all duration-300">
+          Cost Calculator
+        </a>
+      </div>
+      
+      <!-- Trust Indicators -->
+      <div class="mt-16 animate-fade-in" style="animation-delay: 0.9s;">
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-8 text-bubble-light">
+          <div class="flex items-center gap-2">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="font-medium">Licensed & Insured</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="font-medium">10+ Years Experience</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="font-medium">100% Satisfaction Guarantee</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Scroll Indicator -->
+    <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce-gentle">
+      <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+      </svg>
+    </div>
+  </section>
+  
+  <!-- Featured AI Chat Section -->
+  <section id="chat" class="py-16 bg-gradient-to-br from-bubble-light/5 to-bubble-blue/5">
+    <div class="container-custom">
+      <div class="text-center mb-12">
+        <h2 class="text-4xl md:text-5xl font-bold text-neutral-gray-900 mb-4">
+          🚀 <span class="text-gradient">Revolutionary!</span> AI Chat Assistant
+        </h2>
+        <p class="text-xl text-neutral-gray-600 max-w-3xl mx-auto">
+          Chat now with our specialized soffit and fascia assistant. 
+          Get instant quotes, ask questions and schedule your free inspection!
+        </p>
+      </div>
+      
+      <div class="flex justify-center">
+        <FeaturedChatBotWrapper />
+      </div>
+      
+      <div class="text-center mt-8">
+        <div class="inline-flex items-center gap-2 bg-white rounded-full px-6 py-3 shadow-lg border border-bubble-blue/20">
+          <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+          <span class="text-sm font-medium text-neutral-gray-700">Assistant online now</span>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Services Section -->
+    <div id="services">
+      <ServicesSection />
+    </div>
+    
+    <!-- Gallery Section -->
+<ModernCarousel />
+
+  
+  <!-- Why Choose Us Section -->
+  <section id="about" class="section">
+    <div class="container-custom">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div>
+          <h2 class="text-4xl md:text-5xl font-bold text-neutral-gray-900 mb-6">
+            Why Choose <span class="text-gradient">Bubbles Enterprise</span>?
+          </h2>
+          <p class="text-xl text-neutral-gray-600 mb-8">
+            With over 10 years of experience in Orlando, we deliver exceptional quality and customer service.
+          </p>
+          
+          <div class="space-y-6">
+            <div class="flex items-start gap-4">
+              <div class="w-8 h-8 bg-bubble-blue rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-neutral-gray-900 mb-2">Licensed & Insured</h3>
+                <p class="text-neutral-gray-600">Fully licensed and insured for your peace of mind and protection. <a href="/about" class="text-blue-600 hover:text-blue-800 underline">Learn about our certifications</a>.</p>
+              </div>
+            </div>
+            
+            <div class="flex items-start gap-4">
+              <div class="w-8 h-8 bg-bubble-blue rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-neutral-gray-900 mb-2">Quality Materials</h3>
+                <p class="text-neutral-gray-600">We use only premium materials that withstand Florida's climate. <a href="/services" class="text-blue-600 hover:text-blue-800 underline">Explore our material options</a>.</p>
+              </div>
+            </div>
+            
+            <div class="flex items-start gap-4">
+              <div class="w-8 h-8 bg-bubble-blue rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-neutral-gray-900 mb-2">Satisfaction Guarantee</h3>
+                <p class="text-neutral-gray-600">100% satisfaction guarantee on all our work and services.</p>
+              </div>
+            </div>
+            
+            <div class="flex items-start gap-4">
+              <div class="w-8 h-8 bg-bubble-blue rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-neutral-gray-900 mb-2">Free Estimates</h3>
+                <p class="text-neutral-gray-600">Get detailed, no-obligation estimates for your project. <a href="/quote" class="text-blue-600 hover:text-blue-800 underline">Request your free quote</a> or use our <a href="/calculator" class="text-blue-600 hover:text-blue-800 underline">online calculator</a>.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="relative">
+          <div class="aspect-square bg-gradient-light rounded-2xl p-8 flex items-center justify-center">
+            <div class="text-center">
+              <div class="logo-text text-6xl mb-4">
+                Bubbles<span class="logo-accent">Enterprise</span>
+              </div>
+              <p class="text-bubble-dark font-medium text-lg">
+                Your Trusted Partner in Orlando
+              </p>
+            </div>
+          </div>
+          
+          <!-- Decorative elements -->
+          <div class="absolute -top-4 -right-4 w-24 h-24 bg-bubble-blue/10 rounded-full"></div>
+          <div class="absolute -bottom-4 -left-4 w-32 h-32 bg-bubble-accent/10 rounded-full"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Service Area Section -->
+  <section class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="max-w-6xl mx-auto">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl font-bold text-gray-900 mb-4">Serving Orlando and Surrounding Areas</h2>
+          <p class="text-xl text-gray-600">Professional soffit and fascia services</p>
+        </div>
+        
+        <div class="grid md:grid-cols-2 gap-12 items-center">
+          <div>
+            <h3 class="text-2xl font-semibold text-gray-900 mb-6">Where Do We Provide Soffit Services?</h3>
+            <p class="text-gray-600 mb-6 leading-relaxed">
+              Bubbles Enterprise proudly serves Orlando, FL and all surrounding communities throughout Central Florida. 
+              Our experienced team brings professional <a href="/services" class="text-blue-600 hover:text-blue-800 underline">soffit installation, repair, and replacement services</a> directly to your neighborhood. 
+              Learn more <a href="/about" class="text-blue-600 hover:text-blue-800 underline">about our company</a> and get a <a href="/calculator" class="text-blue-600 hover:text-blue-800 underline">free cost estimate</a> today.
+            </p>
+            
+            <div class="grid grid-cols-2 gap-4 text-sm">
+              <div class="space-y-2">
+                <div class="flex items-center text-gray-700">
+                  <svg class="w-4 h-4 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  Orlando
+                </div>
+                <div class="flex items-center text-gray-700">
+                  <svg class="w-4 h-4 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  Winter Park
+                </div>
+                <div class="flex items-center text-gray-700">
+                  <svg class="w-4 h-4 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  Kissimmee
+                </div>
+                <div class="flex items-center text-gray-700">
+                  <svg class="w-4 h-4 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  Sanford
+                </div>
+              </div>
+              <div class="space-y-2">
+                <div class="flex items-center text-gray-700">
+                  <svg class="w-4 h-4 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  Apopka
+                </div>
+                <div class="flex items-center text-gray-700">
+                  <svg class="w-4 h-4 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  Altamonte Springs
+                </div>
+                <div class="flex items-center text-gray-700">
+                  <svg class="w-4 h-4 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  Oviedo
+                </div>
+                <div class="flex items-center text-gray-700">
+                  <svg class="w-4 h-4 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  Lake Mary
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-blue-50 p-8 rounded-2xl">
+            <h4 class="text-xl font-semibold text-gray-900 mb-4">Why Choose Local Orlando Soffit Experts?</h4>
+            <ul class="space-y-3 text-gray-600">
+              <li class="flex items-start">
+                <svg class="w-5 h-5 text-blue-600 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span>Understanding of Florida's unique climate challenges</span>
+              </li>
+              <li class="flex items-start">
+                <svg class="w-5 h-5 text-blue-600 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span>Quick response times within Central Florida</span>
+              </li>
+              <li class="flex items-start">
+                <svg class="w-5 h-5 text-blue-600 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span>Licensed and insured in Florida</span>
+              </li>
+              <li class="flex items-start">
+                <svg class="w-5 h-5 text-blue-600 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span>Established relationships with local suppliers</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section id="contact" class="section gradient-blue">
+    <div class="container-custom text-center text-white">
+      <h2 class="text-4xl md:text-5xl font-bold mb-6">
+        Ready to Get Started?
+      </h2>
+      <p class="text-xl mb-8 max-w-2xl mx-auto">
+        Contact us today for a free estimate on your soffit and fascia project. We're here to help!
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/quote" class="btn bg-white text-bubble-blue hover:bg-bubble-light px-8 py-4 text-lg font-semibold">
+          Get Free Quote
+        </a>
+        <a href="tel:+1-407-715-1790" class="btn bg-transparent border-2 border-white text-white hover:bg-white hover:text-bubble-blue px-8 py-4 text-lg font-semibold">
+          Call Now: (407) 715-1790
+        </a>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Service Modals -->
+  <ServiceModalWrapper />
+</BaseLayout>
+
+<style>
+  @import '../styles/global.css';
+</style>

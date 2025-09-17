@@ -1,0 +1,16 @@
+{
+  "name": "Bubbles Enterprise - Soffit & Fascia Specialists",
+  "short_name": "Bubbles Enterprise",
+  "description": "Professional soffit and fascia services in Orlando, FL. New construction, repairs, and replacements.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

@@ -1,0 +1,135 @@
+{
+  "tech_stack": [
+    "TypeScript",
+    "JavaScript",
+    "Astro",
+    "React",
+    "Tailwind CSS",
+    "Node.js",
+    "Swiper.js",
+    "Lucide React",
+    "Rust",
+    "WebAssembly",
+    "HTML5",
+    "CSS3"
+  ],
+  "features": [
+    {
+      "name": "Homepage",
+      "description": "Main landing page with hero section, services overview, and company information",
+      "files": [
+        "src/pages/index.astro",
+        "src/layouts/BaseLayout.astro"
+      ]
+    },
+    {
+      "name": "Cost Calculator",
+      "description": "Interactive calculator for soffit and fascia cost estimation with WebAssembly performance",
+      "files": [
+        "src/pages/calculator.astro",
+        "src/components/Calculator.astro",
+        "src/utils/calculator.js",
+        "public/js/calculator.js",
+        "src/rust-calculator/"
+      ]
+    },
+    {
+      "name": "Services Pages",
+      "description": "Detailed service pages for new construction, repairs, and remove & replace",
+      "files": [
+        "src/pages/services.astro",
+        "src/pages/services/new-construction.astro",
+        "src/pages/services/repairs.astro",
+        "src/pages/services/remove-replace.astro",
+        "src/components/ServicesSection.astro",
+        "src/components/ServiceCard.astro"
+      ]
+    },
+    {
+      "name": "Quote Request System",
+      "description": "Contact form for requesting quotes and consultations with file upload support",
+      "files": [
+        "src/pages/quote.astro",
+        "src/pages/thank-you.astro",
+        "src/pages/api/contact.js"
+      ]
+    },
+    {
+      "name": "AI Chatbot Integration",
+      "description": "Grok AI chatbot integration for customer support and instant assistance",
+      "files": [
+        "src/components/ChatBotWrapper.astro",
+        "src/components/FeaturedChatBotWrapper.astro",
+        "src/pages/api/chat.ts"
+      ]
+    },
+    {
+      "name": "Navigation System",
+      "description": "Site navigation with header, footer, and breadcrumbs for responsive design",
+      "files": [
+        "src/components/Header.astro",
+        "src/components/Navigation.astro",
+        "src/components/Footer.astro"
+      ]
+    },
+    {
+      "name": "Image Gallery",
+      "description": "Modern carousel and optimized image components for showcasing work",
+      "files": [
+        "src/components/Gallery.astro",
+        "src/pages/gallery.astro"
+      ]
+    },
+    {
+      "name": "Legal Pages",
+      "description": "Privacy policy, terms of service, and legal compliance pages",
+      "files": [
+        "src/pages/privacy.astro",
+        "src/pages/terms.astro"
+      ]
+    },
+    {
+      "name": "About Page",
+      "description": "Company information, team details, and business credentials",
+      "files": [
+        "src/pages/about.astro"
+      ]
+    },
+    {
+      "name": "Customer Testimonials",
+      "description": "Customer reviews and testimonials display system",
+      "files": [
+        "src/pages/testimonials.astro"
+      ]
+    },
+    {
+      "name": "Educational Content",
+      "description": "Measurement guides and educational resources for customers",
+      "files": [
+        "src/pages/measurement-guide.astro"
+      ]
+    },
+    {
+      "name": "Security System",
+      "description": "AI-powered security monitoring and bot protection system",
+      "files": [
+        "src/pages/api/security-monitor.js",
+        "src/pages/api/ai-security.js"
+      ]
+    },
+    {
+      "name": "Email System",
+      "description": "Email utilities for contact forms and notifications",
+      "files": [
+        "src/utils/email.js"
+      ]
+    },
+    {
+      "name": "Admin Dashboard",
+      "description": "Administrative interface for content and system management",
+      "files": [
+        "src/pages/admin/"
+      ]
+    }
+  ]
+}

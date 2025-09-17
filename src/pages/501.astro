@@ -1,0 +1,238 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// Security headers for error pages
+Astro.response.headers.set('X-Content-Type-Options', 'nosniff');
+Astro.response.headers.set('X-Frame-Options', 'DENY');
+Astro.response.headers.set('X-XSS-Protection', '1; mode=block');
+Astro.response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+Astro.response.headers.set('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self';");
+Astro.response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+
+// Set proper status code
+Astro.response.status = 501;
+---
+
+<BaseLayout 
+  title="501 - Not Implemented | Bubbles Enterprise"
+  description="The server does not support the functionality required to fulfill the request. This feature is not yet implemented."
+>
+  <main class="min-h-screen bg-gradient-to-br from-gray-500/5 via-white to-blue-500/5 flex items-center justify-center px-4">
+    <div class="max-w-2xl mx-auto text-center">
+      <!-- Error Icon -->
+      <div class="mb-8">
+        <div class="w-32 h-32 mx-auto bg-gradient-to-br from-gray-500 to-blue-600 rounded-full flex items-center justify-center shadow-2xl animate-pulse-glow">
+          <svg class="w-16 h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Error Content -->
+      <div class="glass-hover rounded-3xl p-8 mb-8">
+        <h1 class="text-6xl font-display font-bold text-gray-600 mb-4">501</h1>
+        <h2 class="text-3xl font-display font-semibold text-neutral-gray-800 mb-4">Not Implemented</h2>
+        <p class="text-lg text-neutral-gray-600 mb-6 leading-relaxed">
+          The server does not support the functionality required to fulfill the request. 
+          This feature is not yet implemented or is currently under development.
+        </p>
+        
+        <!-- Security Notice -->
+        <div class="bg-gray-50 border border-gray-200 rounded-2xl p-4 mb-6">
+          <div class="flex items-center space-x-2">
+            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+            </svg>
+            <p class="text-sm text-gray-800 font-medium">Feature Security</p>
+          </div>
+          <p class="text-sm text-gray-700 mt-2">
+            Unimplemented features are blocked to prevent security vulnerabilities and ensure system stability.
+          </p>
+        </div>
+
+        <!-- Development Status -->
+        <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 mb-6">
+          <h3 class="text-sm font-semibold text-blue-800 mb-3">Development Status:</h3>
+          <div class="space-y-2 text-sm">
+            <div class="flex justify-between items-center">
+              <span class="text-blue-700">Feature Planning:</span>
+              <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">Complete</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-blue-700">Development:</span>
+              <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">In Progress</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-blue-700">Testing:</span>
+              <span class="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-medium">Pending</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-blue-700">Deployment:</span>
+              <span class="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-medium">Pending</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center mb-6">
+          <a href="/" class="btn-primary inline-flex items-center space-x-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+            </svg>
+            <span>Return Home</span>
+          </a>
+          <a href="/roadmap" class="btn-secondary inline-flex items-center space-x-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+            <span>View Roadmap</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Alternatives -->
+      <div class="text-center">
+        <h3 class="text-xl font-display font-semibold text-neutral-gray-800 mb-4">Available Alternatives</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="glass-hover rounded-2xl p-4">
+            <svg class="w-8 h-8 text-bubble-primary mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2h8z"></path>
+            </svg>
+            <h4 class="font-semibold text-neutral-gray-800 mb-2">Current Services</h4>
+            <p class="text-sm text-neutral-gray-600">Explore our existing features and services that are fully operational.</p>
+          </div>
+          
+          <div class="glass-hover rounded-2xl p-4">
+            <svg class="w-8 h-8 text-bubble-primary mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+            </svg>
+            <h4 class="font-semibold text-neutral-gray-800 mb-2">Request Feature</h4>
+            <p class="text-sm text-neutral-gray-600">Contact us to request priority development of this feature.</p>
+          </div>
+          
+          <div class="glass-hover rounded-2xl p-4">
+            <svg class="w-8 h-8 text-bubble-primary mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4.828 4.828A4 4 0 015.5 4H9v1H5.5a3 3 0 00-2.121.879l-.707.707A1 1 0 002 7.414V16.5A1.5 1.5 0 003.5 18H12v1H3.5A2.5 2.5 0 011 16.5V7.414a2 2 0 00-.586-1.414l.707-.707z"></path>
+            </svg>
+            <h4 class="font-semibold text-neutral-gray-800 mb-2">Get Updates</h4>
+            <p class="text-sm text-neutral-gray-600">Subscribe to notifications about new feature releases.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</BaseLayout>
+
+<script>
+  // Security: Log not implemented request for monitoring
+  console.warn('501 Not Implemented - Unimplemented feature accessed');
+  
+  // Security: Log the requested feature/endpoint
+  const requestedPath = window.location.pathname;
+  const requestedMethod = document.querySelector('meta[name="request-method"]')?.content || 'GET';
+  console.warn(`Unimplemented feature requested: ${requestedMethod} ${requestedPath}`);
+  
+  // Security: Clear any cached responses for unimplemented features
+  if ('caches' in window) {
+    caches.keys().then(names => {
+      names.forEach(name => {
+        caches.open(name).then(cache => {
+          cache.keys().then(requests => {
+            requests.forEach(request => {
+              if (request.url.includes(requestedPath)) {
+                cache.delete(request);
+              }
+            });
+          });
+        });
+      });
+    });
+  }
+  
+  // Security: Prevent attempts to access unimplemented features
+  const blockedPaths = [
+    '/api/v2/',
+    '/admin/advanced/',
+    '/beta/',
+    '/experimental/',
+    '/preview/'
+  ];
+  
+  // Security: Monitor navigation attempts to unimplemented features
+  const originalPushState = history.pushState;
+  const originalReplaceState = history.replaceState;
+  
+  history.pushState = function(state, title, url) {
+    if (url && blockedPaths.some(path => url.includes(path))) {
+      console.warn(`Blocked navigation to unimplemented feature: ${url}`);
+      return;
+    }
+    return originalPushState.apply(this, arguments);
+  };
+  
+  history.replaceState = function(state, title, url) {
+    if (url && blockedPaths.some(path => url.includes(path))) {
+      console.warn(`Blocked navigation to unimplemented feature: ${url}`);
+      return;
+    }
+    return originalReplaceState.apply(this, arguments);
+  };
+  
+  // Security: Override fetch to block requests to unimplemented endpoints
+  const originalFetch = window.fetch;
+  window.fetch = function(resource, options = {}) {
+    const url = typeof resource === 'string' ? resource : resource.url;
+    
+    if (blockedPaths.some(path => url.includes(path))) {
+      console.warn(`Blocked fetch request to unimplemented endpoint: ${url}`);
+      return Promise.reject(new Error('Feature not implemented'));
+    }
+    
+    return originalFetch.apply(this, arguments);
+  };
+  
+  // Security: Clear any stored data related to unimplemented features
+  try {
+    const storageKeys = Object.keys(localStorage);
+    storageKeys.forEach(key => {
+      if (blockedPaths.some(path => key.includes(path.replace('/', '')))) {
+        localStorage.removeItem(key);
+      }
+    });
+    
+    const sessionKeys = Object.keys(sessionStorage);
+    sessionKeys.forEach(key => {
+      if (blockedPaths.some(path => key.includes(path.replace('/', '')))) {
+        sessionStorage.removeItem(key);
+      }
+    });
+  } catch (e) {
+    // Storage access might be restricted
+  }
+  
+  // Security: Disable any forms that might submit to unimplemented endpoints
+  document.addEventListener('submit', (e) => {
+    const form = e.target;
+    const action = form.action || '';
+    
+    if (blockedPaths.some(path => action.includes(path))) {
+      e.preventDefault();
+      console.warn(`Blocked form submission to unimplemented endpoint: ${action}`);
+      alert('This feature is not yet implemented. Please try again later.');
+    }
+  });
+  
+  // Security: Monitor and log feature usage attempts
+  document.addEventListener('click', (e) => {
+    const target = e.target.closest('a, button');
+    if (target) {
+      const href = target.href || target.getAttribute('data-href') || '';
+      if (blockedPaths.some(path => href.includes(path))) {
+        e.preventDefault();
+        console.warn(`Blocked click on unimplemented feature: ${href}`);
+        alert('This feature is currently under development.');
+      }
+    }
+  });
+</script>

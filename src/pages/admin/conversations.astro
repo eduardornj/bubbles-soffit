@@ -1,0 +1,804 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Conversas - Admin">
+  <div class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b border-gray-200">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center py-6">
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">💬 Conversas</h1>
+            <p class="text-gray-600 mt-1">Gerencie todas as conversas do chat</p>
+          </div>
+          <div class="flex items-center space-x-4">
+            <div class="bg-blue-50 px-4 py-2 rounded-lg">
+              <span class="text-blue-600 font-semibold" id="total-conversations">-</span>
+              <span class="text-blue-500 text-sm ml-1">Total</span>
+            </div>
+            <div class="bg-green-50 px-4 py-2 rounded-lg">
+              <span class="text-green-600 font-semibold" id="active-conversations">-</span>
+              <span class="text-green-500 text-sm ml-1">Ativas</span>
+            </div>
+            <div class="bg-orange-50 px-4 py-2 rounded-lg">
+              <span class="text-orange-600 font-semibold" id="today-conversations">-</span>
+              <span class="text-orange-500 text-sm ml-1">Hoje</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <!-- Filtros e Busca -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+        <!-- Barra de Busca Segmentada -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">🔍 Buscar conversas:</label>
+          
+          <!-- Tipo de Busca -->
+          <div class="mb-3">
+            <label for="search-type" class="block text-sm font-medium text-gray-600 mb-1">Buscar por:</label>
+            <select id="search-type" class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="all">Todos os campos</option>
+              <option value="name">Nome do cliente</option>
+              <option value="email">Email</option>
+              <option value="phone">Telefone</option>
+              <option value="problem">Problema/Descrição</option>
+              <option value="content">Conteúdo das mensagens</option>
+            </select>
+          </div>
+          
+          <!-- Campo de Busca -->
+          <div class="flex space-x-2">
+            <input 
+              type="text" 
+              id="search-input" 
+              placeholder="Digite o termo de busca..." 
+              class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+            <button id="search-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+              Buscar
+            </button>
+            <button id="clear-search-btn" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+              Limpar
+            </button>
+          </div>
+          
+          <!-- Indicador de busca ativa -->
+          <div id="search-indicator" class="mt-2 hidden">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+              🔍 Busca ativa: <span id="search-term"></span> em <span id="search-field"></span>
+              <button id="remove-search" class="ml-1 text-blue-600 hover:text-blue-800">
+                ✕
+              </button>
+            </span>
+          </div>
+        </div>
+        
+        <!-- Filtros -->
+        <div class="flex items-center space-x-4">
+          <div>
+            <label for="status-filter" class="block text-sm font-medium text-gray-700 mb-1">Status:</label>
+            <select id="status-filter" class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="all">Todos</option>
+              <option value="active">Ativo</option>
+              <option value="completed">Concluído</option>
+              <option value="archived">Arquivado</option>
+            </select>
+          </div>
+          <div>
+            <label for="limit-filter" class="block text-sm font-medium text-gray-700 mb-1">Por página:</label>
+            <select id="limit-filter" class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+            </select>
+          </div>
+          <div class="flex-1"></div>
+          <button id="refresh-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+            🔄 Atualizar
+          </button>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div id="loading" class="text-center py-8 hidden">
+        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <p class="text-gray-600 mt-2">Carregando conversas...</p>
+      </div>
+
+      <!-- Lista de Conversas -->
+      <div id="conversations-container" class="space-y-4">
+        <!-- Conversas serão carregadas aqui via JavaScript -->
+      </div>
+
+      <!-- Paginação -->
+      <div id="pagination" class="mt-8 flex items-center justify-between">
+        <div class="text-sm text-gray-700">
+          Mostrando <span id="showing-from">0</span> a <span id="showing-to">0</span> de <span id="total-items">0</span> conversas
+        </div>
+        <div class="flex space-x-2" id="pagination-buttons">
+          <!-- Botões de paginação serão gerados via JavaScript -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para editar conversa -->
+  <div id="edit-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+      <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full">
+        <div class="flex items-center justify-between p-6 border-b border-gray-200">
+          <h2 class="text-xl font-semibold text-gray-900">✏️ Editar Conversa</h2>
+          <button id="close-edit-modal" class="text-gray-400 hover:text-gray-600 transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="p-6">
+          <form id="edit-form">
+            <input type="hidden" id="edit-session-id">
+            <div class="grid grid-cols-1 gap-4">
+              <div>
+                <label for="edit-client-name" class="block text-sm font-medium text-gray-700 mb-1">Nome do Cliente:</label>
+                <input type="text" id="edit-client-name" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              </div>
+              <div>
+                <label for="edit-client-email" class="block text-sm font-medium text-gray-700 mb-1">Email:</label>
+                <input type="email" id="edit-client-email" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              </div>
+              <div>
+                <label for="edit-client-phone" class="block text-sm font-medium text-gray-700 mb-1">Telefone:</label>
+                <input type="text" id="edit-client-phone" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              </div>
+              <div>
+                <label for="edit-client-problem" class="block text-sm font-medium text-gray-700 mb-1">Problema:</label>
+                <textarea id="edit-client-problem" rows="3" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+              </div>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6">
+              <button type="button" id="cancel-edit" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                Cancelar
+              </button>
+              <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                Salvar Alterações
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para visualizar conversa completa -->
+  <div id="conversation-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+      <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+        <div class="flex items-center justify-between p-6 border-b border-gray-200">
+          <h2 class="text-xl font-semibold text-gray-900" id="modal-title">Conversa Completa</h2>
+          <button id="close-modal" class="text-gray-400 hover:text-gray-600 transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="p-6 overflow-y-auto max-h-[70vh]" id="modal-content">
+          <!-- Conteúdo da conversa será carregado aqui -->
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+// Variáveis globais
+let currentPage = 1;
+let currentLimit = 10;
+let currentStatus = 'all';
+let currentSearch = '';
+let currentSearchType = 'all';
+
+// Função para carregar conversas
+async function loadConversations() {
+  const loading = document.getElementById('loading');
+  const container = document.getElementById('conversations-container');
+  
+  console.log('🚀 Iniciando carregamento de conversas...');
+  console.log('📍 Loading element:', loading);
+  console.log('📍 Container element:', container);
+  
+  if (loading) {
+    loading.classList.remove('hidden');
+    console.log('✅ Loading mostrado');
+  }
+  if (container) {
+    container.innerHTML = '';
+    console.log('✅ Container limpo');
+  }
+  
+  try {
+    const params = new URLSearchParams({
+      page: currentPage.toString(),
+      limit: currentLimit.toString(),
+      status: currentStatus,
+      search: currentSearch,
+      searchType: currentSearchType
+    });
+    
+    console.log('🔍 Carregando conversas com parâmetros:', Object.fromEntries(params));
+    
+    const response = await fetch(`/api/chat/conversations?${params}`);
+    console.log('📡 Response status:', response.status);
+    
+    const data = await response.json();
+    console.log('📊 Dados recebidos:', data);
+    
+    if (loading) {
+      loading.classList.add('hidden');
+      console.log('✅ Loading escondido');
+    }
+    
+    if (data.success && data.conversations) {
+      console.log('✅ Dados válidos, exibindo', data.conversations.length, 'conversas');
+      displayConversations(data.conversations);
+      updatePagination(data.pagination);
+      updateStats(data.pagination.total);
+      updateSearchIndicator();
+    } else {
+      console.log('⚠️ Nenhuma conversa encontrada ou erro nos dados');
+      if (container) {
+        container.innerHTML = '<div class="text-center py-8 text-gray-500">Nenhuma conversa encontrada.</div>';
+      }
+      updateSearchIndicator();
+    }
+  } catch (error) {
+    console.error('❌ Erro ao carregar conversas:', error);
+    const loading = document.getElementById('loading');
+    const container = document.getElementById('conversations-container');
+    
+    if (loading) loading.classList.add('hidden');
+    if (container) {
+      container.innerHTML = `<div class="text-center py-8 text-red-500">Erro ao carregar conversas: ${error.message}<br><button onclick="loadConversations()" class="mt-2 bg-blue-500 text-white px-4 py-2 rounded">Tentar Novamente</button></div>`;
+    }
+  }
+}
+
+// Função para exibir conversas
+function displayConversations(conversations) {
+  console.log('🎨 displayConversations chamada com', conversations.length, 'conversas');
+  const container = document.getElementById('conversations-container');
+  
+  if (!container) {
+    console.error('❌ Container não encontrado!');
+    return;
+  }
+  
+  console.log('📍 Container encontrado:', container);
+  
+  const html = conversations.map(conv => `
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+      <div class="flex items-start justify-between">
+        <div class="flex-1">
+          <div class="flex items-center space-x-3 mb-2">
+            <h3 class="font-semibold text-gray-900">${conv.client_name || 'Sem nome'}</h3>
+            <span class="px-2 py-1 text-xs rounded-full ${
+              conv.status === 'active' ? 'bg-green-100 text-green-800' :
+              conv.status === 'completed' ? 'bg-blue-100 text-blue-800' :
+              'bg-gray-100 text-gray-800'
+            }">
+              ${conv.status || 'N/A'}
+            </span>
+          </div>
+          <div class="text-sm text-gray-600 space-y-1">
+            ${conv.client_email ? `<div>📧 ${conv.client_email}</div>` : ''}
+            ${conv.client_phone ? `<div>📱 ${conv.client_phone}</div>` : ''}
+            ${conv.client_address ? `<div>📍 ${conv.client_address}</div>` : ''}
+          </div>
+          ${conv.client_problem ? `<div class="mt-2 text-sm text-gray-700"><strong>Problema:</strong> ${conv.client_problem}</div>` : ''}
+        </div>
+        <div class="flex flex-col items-end space-y-2">
+          <div class="text-right text-sm text-gray-500">
+            <div>ID: ${conv.id}</div>
+            <div>${new Date(conv.created_at).toLocaleDateString('pt-BR')}</div>
+            <div>${new Date(conv.created_at).toLocaleTimeString('pt-BR')}</div>
+          </div>
+          <!-- Botões de Ação -->
+          <div class="flex space-x-2">
+            <button onclick="viewConversation('${conv.session_id}')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs font-medium transition-colors" title="Ver conversa">
+              👁️ Ver
+            </button>
+            <button onclick="editConversation('${conv.session_id}', '${conv.client_name || ''}', '${conv.client_email || ''}', '${conv.client_phone || ''}', '${(conv.client_problem || '').replace(/'/g, "&apos;")}')") class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-xs font-medium transition-colors" title="Editar">
+              ✏️ Editar
+            </button>
+            <button onclick="toggleStatus('${conv.session_id}', '${conv.status}')" class="${conv.status === 'active' ? 'bg-orange-500 hover:bg-orange-600' : 'bg-green-500 hover:bg-green-600'} text-white px-3 py-1 rounded text-xs font-medium transition-colors" title="${conv.status === 'active' ? 'Marcar como inativo' : 'Marcar como ativo'}">
+              ${conv.status === 'active' ? '⏸️ Inativar' : '▶️ Ativar'}
+            </button>
+            <button onclick="deleteConversation('${conv.session_id}')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs font-medium transition-colors" title="Excluir">
+              🗑️ Excluir
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  
+  console.log('📝 HTML gerado, tamanho:', html.length, 'caracteres');
+  container.innerHTML = html;
+  console.log('✅ HTML inserido no container');
+}
+
+// Função para visualizar conversa
+async function viewConversation(sessionId) {
+  try {
+    console.log('🔍 Carregando conversa:', sessionId);
+    
+    // Buscar a conversa específica usando a API correta
+    const response = await fetch(`/api/chat/conversation/${sessionId}`);
+    const data = await response.json();
+    
+    if (data.success && data.conversation) {
+      const conversation = data.conversation;
+      
+      if (conversation) {
+        const modal = document.getElementById('conversation-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalContent = document.getElementById('modal-content');
+        
+        if (modalTitle) modalTitle.textContent = `Conversa: ${conversation.client_name || 'Sem nome'}`;
+        
+        if (modalContent) {
+          let messages = [];
+          
+          // Tentar parsear as mensagens
+          try {
+            if (conversation.messages) {
+              // Se messages é uma string, tentar fazer parse
+              if (typeof conversation.messages === 'string') {
+                // Remover aspas extras e fazer parse
+                const cleanMessages = conversation.messages.replace(/^"|"$/g, '').replace(/\\"/g, '"');
+                messages = JSON.parse(cleanMessages);
+              } else {
+                messages = conversation.messages;
+              }
+            }
+          } catch (parseError) {
+            console.warn('Erro ao parsear mensagens:', parseError);
+            messages = [{
+              content: 'Erro ao carregar mensagens da conversa',
+              timestamp: new Date().toISOString(),
+              type: 'system'
+            }];
+          }
+          
+          modalContent.innerHTML = `
+            <div class="mb-4 p-4 bg-gray-50 rounded-lg">
+              <h3 class="font-semibold text-gray-900 mb-2">Informações do Cliente:</h3>
+              <div class="grid grid-cols-2 gap-4 text-sm">
+                <div><strong>Nome:</strong> ${conversation.client_name || 'N/A'}</div>
+                <div><strong>Email:</strong> ${conversation.client_email || 'N/A'}</div>
+                <div><strong>Telefone:</strong> ${conversation.client_phone || 'N/A'}</div>
+                <div><strong>Status:</strong> ${conversation.status || 'N/A'}</div>
+              </div>
+              ${conversation.client_problem ? `<div class="mt-2"><strong>Problema:</strong> ${conversation.client_problem}</div>` : ''}
+            </div>
+            <div class="space-y-4">
+              <h3 class="font-semibold text-gray-900">Histórico da Conversa:</h3>
+              ${messages.map(msg => `
+                <div class="${msg.type === 'user' ? 'text-right' : 'text-left'}">
+                  <div class="inline-block max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                    msg.type === 'user' 
+                      ? 'bg-blue-500 text-white' 
+                      : msg.type === 'system'
+                      ? 'bg-red-100 text-red-800'
+                      : 'bg-gray-200 text-gray-800'
+                  }">
+                    <p class="text-sm">${msg.content}</p>
+                    <p class="text-xs mt-1 opacity-75">${new Date(msg.timestamp).toLocaleString('pt-BR')}</p>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          `;
+        }
+        
+        if (modal) modal.classList.remove('hidden');
+      } else {
+        alert('Conversa não encontrada');
+      }
+    } else {
+      alert('Erro ao carregar conversa');
+    }
+  } catch (error) {
+    console.error('❌ Erro ao carregar conversa:', error);
+    alert('Erro ao carregar conversa: ' + error.message);
+  }
+}
+
+// Função para editar conversa
+async function editConversation(sessionId, name, email, phone, problem) {
+  try {
+    console.log('📝 Carregando conversa para edição:', sessionId);
+    
+    // Se os dados já foram passados como parâmetros, usar diretamente
+    if (name !== undefined) {
+      const modal = document.getElementById('edit-modal');
+      const sessionIdInput = document.getElementById('edit-session-id');
+      const nameInput = document.getElementById('edit-client-name');
+      const emailInput = document.getElementById('edit-client-email');
+      const phoneInput = document.getElementById('edit-client-phone');
+      const problemInput = document.getElementById('edit-client-problem');
+      
+      if (sessionIdInput) sessionIdInput.value = sessionId;
+      if (nameInput) nameInput.value = name;
+      if (emailInput) emailInput.value = email;
+      if (phoneInput) phoneInput.value = phone;
+      if (problemInput) problemInput.value = problem.replace(/&apos;/g, "'");
+      
+      if (modal) modal.classList.remove('hidden');
+      return;
+    }
+    
+    // Caso contrário, buscar os dados da conversa
+    const response = await fetch(`/api/chat/conversations?search=${sessionId}&searchType=all`);
+    const data = await response.json();
+    
+    if (data.success && data.conversations && data.conversations.length > 0) {
+      const conversation = data.conversations.find(c => c.session_id === sessionId);
+      
+      if (conversation) {
+        console.log('✅ Conversa encontrada para edição:', conversation);
+        
+        const modal = document.getElementById('edit-modal');
+        const sessionIdInput = document.getElementById('edit-session-id');
+        const nameInput = document.getElementById('edit-client-name');
+        const emailInput = document.getElementById('edit-client-email');
+        const phoneInput = document.getElementById('edit-client-phone');
+        const problemInput = document.getElementById('edit-client-problem');
+        
+        if (sessionIdInput) sessionIdInput.value = conversation.session_id;
+        if (nameInput) nameInput.value = conversation.client_name || '';
+        if (emailInput) emailInput.value = conversation.client_email || '';
+        if (phoneInput) phoneInput.value = conversation.client_phone || '';
+        if (problemInput) problemInput.value = conversation.client_problem || '';
+        
+        if (modal) modal.classList.remove('hidden');
+      } else {
+        console.error('❌ Conversa não encontrada na lista retornada');
+        alert('Conversa não encontrada para edição');
+      }
+    } else {
+      console.error('❌ Erro na resposta da API:', data);
+      alert('Erro ao carregar conversa para edição: ' + (data.error || 'Conversa não encontrada'));
+    }
+  } catch (error) {
+    console.error('❌ Erro ao carregar conversa:', error);
+    alert('Erro ao carregar conversa: ' + error.message);
+  }
+}
+
+// Função para alterar status
+async function toggleStatus(sessionId, currentStatus) {
+  const newStatus = currentStatus === 'active' ? 'completed' : 'active';
+  
+  try {
+    const response = await fetch('/api/chat/toggle-status', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        sessionId: sessionId,
+        status: newStatus
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      console.log('✅ Status alterado com sucesso');
+      loadConversations(); // Recarregar lista
+    } else {
+      alert('Erro ao alterar status: ' + data.error);
+    }
+  } catch (error) {
+    console.error('Erro ao alterar status:', error);
+    alert('Erro ao alterar status');
+  }
+}
+
+// Função para excluir conversa
+async function deleteConversation(sessionId) {
+  // Buscar informações da conversa para mostrar no confirm
+  let conversationInfo = 'esta conversa';
+  try {
+    const response = await fetch(`/api/chat/conversations?search=${sessionId}&searchType=all`);
+    const data = await response.json();
+    if (data.success && data.conversations && data.conversations.length > 0) {
+      const conv = data.conversations.find(c => c.session_id === sessionId);
+      if (conv) {
+        conversationInfo = `a conversa de ${conv.client_name || 'cliente sem nome'} (ID: ${conv.id})`;
+      }
+    }
+  } catch (e) {
+    console.warn('Não foi possível carregar info da conversa para confirmação');
+  }
+  
+  if (!confirm(`Tem certeza que deseja excluir ${conversationInfo}?\n\nEsta ação não pode ser desfeita e todos os dados da conversa serão perdidos permanentemente.`)) {
+    return;
+  }
+  
+  try {
+    console.log('🗑️ Excluindo conversa:', sessionId);
+    
+    const response = await fetch(`/api/chat/delete-conversation?sessionId=${sessionId}`, {
+      method: 'DELETE'
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      console.log('✅ Conversa excluída com sucesso');
+      alert('Conversa excluída com sucesso!');
+      loadConversations(); // Recarregar lista
+    } else {
+      console.error('❌ Erro na API:', data.error);
+      alert('Erro ao excluir conversa: ' + (data.error || 'Erro desconhecido'));
+    }
+  } catch (error) {
+    console.error('❌ Erro ao excluir conversa:', error);
+    alert('Erro ao excluir conversa: ' + error.message);
+  }
+}
+
+// Função para atualizar paginação
+function updatePagination(pagination) {
+  const showingFrom = document.getElementById('showing-from');
+  const showingTo = document.getElementById('showing-to');
+  const totalItems = document.getElementById('total-items');
+  
+  if (showingFrom) showingFrom.textContent = pagination.from || 0;
+  if (showingTo) showingTo.textContent = pagination.to || 0;
+  if (totalItems) totalItems.textContent = pagination.total || 0;
+}
+
+// Função para atualizar estatísticas
+function updateStats(total) {
+  const totalEl = document.getElementById('total-conversations');
+  if (totalEl) totalEl.textContent = total || 0;
+}
+
+// Função para atualizar indicador de busca
+function updateSearchIndicator() {
+  const indicator = document.getElementById('search-indicator');
+  const searchTerm = document.getElementById('search-term');
+  const searchField = document.getElementById('search-field');
+  
+  if (currentSearch && currentSearch.trim()) {
+    const fieldNames = {
+      'all': 'todos os campos',
+      'name': 'nome do cliente',
+      'email': 'email',
+      'phone': 'telefone',
+      'problem': 'problema/descrição',
+      'content': 'conteúdo das mensagens'
+    };
+    
+    if (searchTerm) searchTerm.textContent = currentSearch;
+    if (searchField) searchField.textContent = fieldNames[currentSearchType] || 'todos os campos';
+    if (indicator) indicator.classList.remove('hidden');
+  } else {
+    if (indicator) indicator.classList.add('hidden');
+  }
+}
+
+// Função para realizar busca
+function performSearch() {
+  const searchInput = document.getElementById('search-input');
+  const searchType = document.getElementById('search-type');
+  
+  if (searchInput && searchType) {
+    currentSearch = searchInput.value.trim();
+    currentSearchType = searchType.value;
+    currentPage = 1;
+    console.log('🔍 Realizando busca:', { term: currentSearch, type: currentSearchType });
+    loadConversations();
+  }
+}
+
+// Função para limpar busca
+function clearSearch() {
+  const searchInput = document.getElementById('search-input');
+  const searchType = document.getElementById('search-type');
+  
+  if (searchInput) searchInput.value = '';
+  if (searchType) searchType.value = 'all';
+  
+  currentSearch = '';
+  currentSearchType = 'all';
+  currentPage = 1;
+  console.log('🧹 Limpando busca');
+  loadConversations();
+}
+
+// Inicialização
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('🚀 Página carregada!');
+  
+  // Limpar campos de busca na inicialização
+  const searchInput = document.getElementById('search-input');
+  const searchType = document.getElementById('search-type');
+  
+  if (searchInput) {
+    searchInput.value = '';
+    console.log('🧹 Campo de busca limpo na inicialização');
+  }
+  if (searchType) {
+    searchType.value = 'all';
+    console.log('🧹 Tipo de busca resetado para "all"');
+  }
+  
+  // Resetar variáveis globais
+  currentSearch = '';
+  currentSearchType = 'all';
+  currentPage = 1;
+  console.log('🔄 Variáveis globais resetadas:', { currentSearch, currentSearchType, currentPage });
+  
+  // Event listeners para busca
+  const searchBtn = document.getElementById('search-btn');
+  const clearBtn = document.getElementById('clear-search-btn');
+  const removeSearchBtn = document.getElementById('remove-search');
+  const statusFilter = document.getElementById('status-filter');
+  const limitFilter = document.getElementById('limit-filter');
+  const refreshBtn = document.getElementById('refresh-btn');
+  
+  if (searchBtn) {
+    searchBtn.addEventListener('click', performSearch);
+    console.log('✅ Event listener do botão buscar adicionado');
+  }
+  
+  if (clearBtn) {
+    clearBtn.addEventListener('click', clearSearch);
+    console.log('✅ Event listener do botão limpar adicionado');
+  }
+  
+  if (removeSearchBtn) {
+    removeSearchBtn.addEventListener('click', clearSearch);
+    console.log('✅ Event listener do botão remover busca adicionado');
+  }
+  
+  if (searchInput) {
+    searchInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        performSearch();
+      }
+    });
+    console.log('✅ Event listener do campo de busca adicionado');
+  }
+  
+  if (searchType) {
+    searchType.addEventListener('change', function() {
+      // Atualizar placeholder baseado no tipo selecionado
+      const placeholders = {
+        'all': 'Digite o termo de busca...',
+        'name': 'Digite o nome do cliente...',
+        'email': 'Digite o email...',
+        'phone': 'Digite o telefone...',
+        'problem': 'Digite palavras do problema...',
+        'content': 'Digite palavras das mensagens...'
+      };
+      
+      if (searchInput) {
+        searchInput.placeholder = placeholders[this.value] || 'Digite o termo de busca...';
+      }
+    });
+    console.log('✅ Event listener do seletor de tipo de busca adicionado');
+  }
+  
+  if (statusFilter) {
+    statusFilter.addEventListener('change', function() {
+      currentStatus = this.value;
+      currentPage = 1;
+      loadConversations();
+    });
+  }
+  
+  if (limitFilter) {
+    limitFilter.addEventListener('change', function() {
+      currentLimit = parseInt(this.value);
+      currentPage = 1;
+      loadConversations();
+    });
+  }
+  
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', function() {
+      loadConversations();
+    });
+  }
+  
+  // Event listeners para modais
+  const closeModal = document.getElementById('close-modal');
+  const conversationModal = document.getElementById('conversation-modal');
+  
+  if (closeModal) {
+    closeModal.addEventListener('click', function() {
+      if (conversationModal) conversationModal.classList.add('hidden');
+    });
+  }
+  
+  const closeEditModal = document.getElementById('close-edit-modal');
+  const editModal = document.getElementById('edit-modal');
+  const cancelEdit = document.getElementById('cancel-edit');
+  
+  if (closeEditModal) {
+    closeEditModal.addEventListener('click', function() {
+      if (editModal) editModal.classList.add('hidden');
+    });
+  }
+  
+  if (cancelEdit) {
+    cancelEdit.addEventListener('click', function() {
+      if (editModal) editModal.classList.add('hidden');
+    });
+  }
+  
+  // Event listener para formulário de edição
+  const editForm = document.getElementById('edit-form');
+  if (editForm) {
+    editForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const sessionId = document.getElementById('edit-session-id').value;
+      const clientName = document.getElementById('edit-client-name').value;
+      const clientEmail = document.getElementById('edit-client-email').value;
+      const clientPhone = document.getElementById('edit-client-phone').value;
+      const clientProblem = document.getElementById('edit-client-problem').value;
+      
+      try {
+        const response = await fetch('/api/chat/edit-conversation', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            sessionId: sessionId,
+            client_name: clientName,
+            client_email: clientEmail,
+            client_phone: clientPhone,
+            client_problem: clientProblem
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          console.log('✅ Conversa editada com sucesso');
+          if (editModal) editModal.classList.add('hidden');
+          loadConversations(); // Recarregar lista
+        } else {
+          alert('Erro ao editar conversa: ' + data.error);
+        }
+      } catch (error) {
+        console.error('Erro ao editar conversa:', error);
+        alert('Erro ao editar conversa');
+      }
+    });
+  }
+  
+  // Carregar conversas inicialmente
+  loadConversations();
+});
+
+// Tornar funções globais para uso nos botões
+window.viewConversation = viewConversation;
+window.editConversation = editConversation;
+window.toggleStatus = toggleStatus;
+window.deleteConversation = deleteConversation;
+</script>
+
+<style>
+  /* Estilos adicionais se necessário */
+</style>

@@ -1,0 +1,297 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// Security headers for error pages
+Astro.response.headers.set('X-Content-Type-Options', 'nosniff');
+Astro.response.headers.set('X-Frame-Options', 'DENY');
+Astro.response.headers.set('X-XSS-Protection', '1; mode=block');
+Astro.response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+Astro.response.headers.set('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self';");
+Astro.response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+
+// Set proper status code
+Astro.response.status = 505;
+---
+
+<BaseLayout 
+  title="505 - HTTP Version Not Supported | Bubbles Enterprise"
+  description="The server does not support the HTTP protocol version used in the request. Please use a supported HTTP version."
+>
+  <main class="min-h-screen bg-gradient-to-br from-indigo-500/5 via-white to-purple-500/5 flex items-center justify-center px-4">
+    <div class="max-w-2xl mx-auto text-center">
+      <!-- Error Icon -->
+      <div class="mb-8">
+        <div class="w-32 h-32 mx-auto bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center shadow-2xl animate-pulse-glow">
+          <svg class="w-16 h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Error Content -->
+      <div class="glass-hover rounded-3xl p-8 mb-8">
+        <h1 class="text-6xl font-display font-bold text-indigo-600 mb-4">505</h1>
+        <h2 class="text-3xl font-display font-semibold text-neutral-gray-800 mb-4">HTTP Version Not Supported</h2>
+        <p class="text-lg text-neutral-gray-600 mb-6 leading-relaxed">
+          The server does not support the HTTP protocol version used in the request. 
+          Please ensure you're using a supported HTTP version.
+        </p>
+        
+        <!-- Security Notice -->
+        <div class="bg-indigo-50 border border-indigo-200 rounded-2xl p-4 mb-6">
+          <div class="flex items-center space-x-2">
+            <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+            </svg>
+            <p class="text-sm text-indigo-800 font-medium">Protocol Security</p>
+          </div>
+          <p class="text-sm text-indigo-700 mt-2">
+            Only secure and supported HTTP versions are accepted to maintain security standards and prevent vulnerabilities.
+          </p>
+        </div>
+
+        <!-- Supported HTTP Versions -->
+        <div class="bg-green-50 border border-green-200 rounded-2xl p-4 mb-6">
+          <h3 class="text-sm font-semibold text-green-800 mb-3">Supported HTTP Versions:</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+            <div class="flex justify-between items-center">
+              <span class="text-green-700">HTTP/1.1:</span>
+              <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">✓ Supported</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-green-700">HTTP/2:</span>
+              <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">✓ Supported</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-red-700">HTTP/0.9:</span>
+              <span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">✗ Deprecated</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-red-700">HTTP/1.0:</span>
+              <span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">✗ Legacy</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Browser Compatibility -->
+        <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 mb-6">
+          <h3 class="text-sm font-semibold text-blue-800 mb-3">Browser Compatibility:</h3>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+            <div class="text-center p-2 bg-blue-100 rounded-lg">
+              <div class="font-medium text-blue-800">Chrome</div>
+              <div class="text-blue-600">v80+</div>
+            </div>
+            <div class="text-center p-2 bg-blue-100 rounded-lg">
+              <div class="font-medium text-blue-800">Firefox</div>
+              <div class="text-blue-600">v75+</div>
+            </div>
+            <div class="text-center p-2 bg-blue-100 rounded-lg">
+              <div class="font-medium text-blue-800">Safari</div>
+              <div class="text-blue-600">v13+</div>
+            </div>
+            <div class="text-center p-2 bg-blue-100 rounded-lg">
+              <div class="font-medium text-blue-800">Edge</div>
+              <div class="text-blue-600">v80+</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center mb-6">
+          <a href="/" class="btn-primary inline-flex items-center space-x-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+            </svg>
+            <span>Return Home</span>
+          </a>
+          <a href="/support" class="btn-secondary inline-flex items-center space-x-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path>
+            </svg>
+            <span>Technical Support</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Solutions -->
+      <div class="text-center">
+        <h3 class="text-xl font-display font-semibold text-neutral-gray-800 mb-4">How to Fix This</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="glass-hover rounded-2xl p-4">
+            <svg class="w-8 h-8 text-bubble-primary mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            <h4 class="font-semibold text-neutral-gray-800 mb-2">Update Browser</h4>
+            <p class="text-sm text-neutral-gray-600">Ensure you're using a modern browser that supports HTTP/1.1 or HTTP/2.</p>
+          </div>
+          
+          <div class="glass-hover rounded-2xl p-4">
+            <svg class="w-8 h-8 text-bubble-primary mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+            <h4 class="font-semibold text-neutral-gray-800 mb-2">Check Settings</h4>
+            <p class="text-sm text-neutral-gray-600">Verify your client or application is configured to use supported HTTP versions.</p>
+          </div>
+          
+          <div class="glass-hover rounded-2xl p-4">
+            <svg class="w-8 h-8 text-bubble-primary mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+            </svg>
+            <h4 class="font-semibold text-neutral-gray-800 mb-2">Contact Support</h4>
+            <p class="text-sm text-neutral-gray-600">Call (407) 715-1790 if you continue experiencing HTTP version issues.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</BaseLayout>
+
+<script>
+  // Security: Log HTTP version not supported for monitoring
+  console.warn('505 HTTP Version Not Supported - Unsupported protocol version detected');
+  
+  // Security: Detect and log the HTTP version if possible
+  const httpVersion = navigator.userAgent.includes('HTTP/') ? 
+    navigator.userAgent.match(/HTTP\/(\d+\.\d+)/)?.[1] || 'unknown' : 'unknown';
+  console.warn(`Client HTTP version: ${httpVersion}`);
+  
+  // Security: Clear any cached responses with unsupported HTTP versions
+  if ('caches' in window) {
+    caches.keys().then(names => {
+      names.forEach(name => {
+        caches.open(name).then(cache => {
+          cache.keys().then(requests => {
+            requests.forEach(request => {
+              // Clear requests that might be using unsupported versions
+              const url = request.url;
+              if (url.includes('http/0.9') || url.includes('http/1.0')) {
+                cache.delete(request);
+              }
+            });
+          });
+        });
+      });
+    });
+  }
+  
+  // Security: Monitor and upgrade HTTP requests
+  const originalFetch = window.fetch;
+  window.fetch = function(resource, options = {}) {
+    // Ensure modern HTTP version is used
+    if (options.headers) {
+      // Remove any legacy HTTP version headers
+      delete options.headers['HTTP-Version'];
+      delete options.headers['http-version'];
+    }
+    
+    return originalFetch.apply(this, arguments).catch(error => {
+      if (error.message.includes('HTTP version') || error.message.includes('505')) {
+        console.warn('HTTP version error detected, attempting retry with default version');
+        // Retry without explicit version headers
+        const cleanOptions = { ...options };
+        if (cleanOptions.headers) {
+          const cleanHeaders = { ...cleanOptions.headers };
+          delete cleanHeaders['HTTP-Version'];
+          delete cleanHeaders['http-version'];
+          cleanOptions.headers = cleanHeaders;
+        }
+        return originalFetch.call(this, resource, cleanOptions);
+      }
+      throw error;
+    });
+  };
+  
+  // Security: Clear any stored HTTP version preferences
+  try {
+    const storageKeys = Object.keys(localStorage);
+    storageKeys.forEach(key => {
+      if (key.toLowerCase().includes('http') && 
+          (key.includes('version') || key.includes('protocol'))) {
+        const value = localStorage.getItem(key);
+        if (value && (value.includes('0.9') || value.includes('1.0'))) {
+          localStorage.removeItem(key);
+        }
+      }
+    });
+    
+    const sessionKeys = Object.keys(sessionStorage);
+    sessionKeys.forEach(key => {
+      if (key.toLowerCase().includes('http') && 
+          (key.includes('version') || key.includes('protocol'))) {
+        const value = sessionStorage.getItem(key);
+        if (value && (value.includes('0.9') || value.includes('1.0'))) {
+          sessionStorage.removeItem(key);
+        }
+      }
+    });
+  } catch (e) {
+    // Storage access might be restricted
+  }
+  
+  // Security: Override XMLHttpRequest to ensure proper HTTP version
+  const originalXHROpen = XMLHttpRequest.prototype.open;
+  XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
+    // Call original method
+    const result = originalXHROpen.call(this, method, url, async, user, password);
+    
+    // Ensure we don't set legacy HTTP version headers
+    const originalSetRequestHeader = this.setRequestHeader;
+    this.setRequestHeader = function(header, value) {
+      if (header.toLowerCase().includes('http-version') || 
+          header.toLowerCase().includes('protocol-version')) {
+        console.warn(`Blocked legacy HTTP version header: ${header}`);
+        return;
+      }
+      return originalSetRequestHeader.call(this, header, value);
+    };
+    
+    return result;
+  };
+  
+  // Security: Monitor for legacy protocol usage attempts
+  document.addEventListener('submit', (e) => {
+    const form = e.target;
+    const action = form.action || '';
+    
+    // Check if form is trying to use legacy protocols
+    if (action.includes('http/0.9') || action.includes('http/1.0')) {
+      e.preventDefault();
+      console.warn(`Blocked form submission with legacy HTTP version: ${action}`);
+      alert('This form uses an unsupported HTTP version. Please contact support.');
+    }
+  });
+  
+  // Security: Browser compatibility check
+  function checkBrowserCompatibility() {
+    const userAgent = navigator.userAgent;
+    const isModernBrowser = (
+      (userAgent.includes('Chrome') && parseInt(userAgent.match(/Chrome\/(\d+)/)?.[1] || '0') >= 80) ||
+      (userAgent.includes('Firefox') && parseInt(userAgent.match(/Firefox\/(\d+)/)?.[1] || '0') >= 75) ||
+      (userAgent.includes('Safari') && parseInt(userAgent.match(/Version\/(\d+)/)?.[1] || '0') >= 13) ||
+      (userAgent.includes('Edge') && parseInt(userAgent.match(/Edge\/(\d+)/)?.[1] || '0') >= 80)
+    );
+    
+    if (!isModernBrowser) {
+      console.warn('Browser may not support modern HTTP versions');
+      const warningDiv = document.createElement('div');
+      warningDiv.className = 'fixed top-4 left-4 right-4 bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded z-50';
+      warningDiv.innerHTML = `
+        <div class="flex items-center">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+          </svg>
+          <span>Your browser may not support modern HTTP versions. Please consider updating.</span>
+        </div>
+      `;
+      document.body.appendChild(warningDiv);
+      
+      setTimeout(() => {
+        warningDiv.remove();
+      }, 10000);
+    }
+  }
+  
+  // Run compatibility check
+  checkBrowserCompatibility();
+</script>

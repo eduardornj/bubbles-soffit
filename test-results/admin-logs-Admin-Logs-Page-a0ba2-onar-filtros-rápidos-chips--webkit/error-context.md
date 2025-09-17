@@ -1,0 +1,167 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - link "Skip to main content" [ref=e2]:
+    - /url: "#main-content"
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - link "Bubbles Enterprise" [ref=e7]:
+          - /url: /
+          - generic:
+            - img
+          - generic [ref=e12]:
+            - generic [ref=e13]: Bubbles
+            - generic [ref=e14]: Enterprise
+        - navigation [ref=e15]:
+          - link "Home" [ref=e16]:
+            - /url: /
+          - link "Services" [ref=e17]:
+            - /url: /services
+          - link "About" [ref=e18]:
+            - /url: /about
+          - link "Calculator" [ref=e19]:
+            - /url: /calculator
+          - link "Certifications" [ref=e20]:
+            - /url: /certifications
+          - link "Contact" [ref=e21]:
+            - /url: /quote
+        - generic [ref=e22]:
+          - link "(407) 715-1790" [ref=e23]:
+            - /url: tel:+1-407-715-1790
+          - link "Free Quote" [ref=e24]:
+            - /url: /quote
+        - button "Toggle mobile menu" [ref=e25]:
+          - img
+      - navigation [ref=e29]:
+        - link "🏠 Home" [ref=e30]:
+          - /url: /
+        - link "🔧 Services" [ref=e31]:
+          - /url: /services
+        - link "ℹ️ About" [ref=e32]:
+          - /url: /about
+        - link "🧮 Calculator" [ref=e33]:
+          - /url: /calculator
+        - link "🏆 Certifications" [ref=e34]:
+          - /url: /certifications
+        - link "📞 Contact" [ref=e35]:
+          - /url: /quote
+        - generic [ref=e36]:
+          - link "📱 (407) 715-1790" [ref=e37]:
+            - /url: tel:+1-407-715-1790
+          - link "✨ Get Free Quote" [ref=e39]:
+            - /url: /quote
+  - main [ref=e40]:
+    - main [ref=e41]:
+      - generic [ref=e42]:
+        - generic:
+          - generic:
+            - img
+        - generic [ref=e44]:
+          - heading "500" [level=1] [ref=e45]
+          - heading "Internal Server Error" [level=2] [ref=e46]
+          - paragraph [ref=e47]: We're experiencing technical difficulties on our end. Our team has been automatically notified and is working to resolve this issue.
+          - generic [ref=e48]:
+            - generic [ref=e49]:
+              - img
+              - paragraph [ref=e51]: System Notice
+            - paragraph [ref=e52]: This error has been logged and our technical team has been notified. No sensitive information has been exposed.
+          - generic [ref=e53]:
+            - button "Try Again" [ref=e54]:
+              - img [ref=e55]
+              - generic [ref=e57]: Try Again
+            - link "Return Home" [ref=e58]:
+              - /url: /
+              - img [ref=e59]
+              - generic [ref=e61]: Return Home
+        - generic [ref=e62]:
+          - heading "What Can You Do?" [level=3] [ref=e63]
+          - generic [ref=e64]:
+            - generic [ref=e65]:
+              - img [ref=e66]
+              - heading "Wait a Moment" [level=4] [ref=e68]
+              - paragraph [ref=e69]: The issue may be temporary. Try refreshing in a few minutes.
+            - generic [ref=e70]:
+              - img [ref=e71]
+              - heading "Call Us" [level=4] [ref=e73]
+              - paragraph [ref=e74]: Contact us at (407) 715-1790 for immediate assistance.
+            - generic [ref=e75]:
+              - img [ref=e76]
+              - heading "Email Support" [level=4] [ref=e78]
+              - paragraph [ref=e79]: Send us an email at contact@bubblesenterprise.com
+  - contentinfo [ref=e80]:
+    - generic [ref=e82]:
+      - generic [ref=e83]:
+        - generic [ref=e84]:
+          - generic:
+            - img
+          - generic [ref=e89]:
+            - generic [ref=e90]: Bubbles
+            - generic [ref=e91]: Enterprise
+        - paragraph [ref=e92]: Professional soffit and fascia specialists serving Orlando, FL and surrounding areas. Quality workmanship with guaranteed results for over 15 years.
+        - generic [ref=e93]:
+          - generic [ref=e94]:
+            - img [ref=e95]
+            - link "(407) 715-1790" [ref=e97]:
+              - /url: tel:+1-407-715-1790
+          - generic [ref=e98]:
+            - img [ref=e99]
+            - link "contact@bubblesenterprise.com" [ref=e101]:
+              - /url: mailto:contact@bubblesenterprise.com
+          - generic [ref=e102]:
+            - img [ref=e103]
+            - generic [ref=e106]:
+              - text: Orlando, FL
+              - text: Serving Central Florida
+      - generic [ref=e107]:
+        - heading "Services" [level=3] [ref=e108]
+        - list [ref=e109]:
+          - listitem [ref=e110]:
+            - link "New Construction" [ref=e111]:
+              - /url: /services/new-construction
+          - listitem [ref=e112]:
+            - link "Remove & Replace" [ref=e113]:
+              - /url: /services/remove-replace
+          - listitem [ref=e114]:
+            - link "Repairs" [ref=e115]:
+              - /url: /services/repairs
+          - listitem [ref=e116]:
+            - link "Cost Calculator" [ref=e117]:
+              - /url: /calculator
+      - generic [ref=e118]:
+        - heading "Company" [level=3] [ref=e119]
+        - list [ref=e120]:
+          - listitem [ref=e121]:
+            - link "About Us" [ref=e122]:
+              - /url: /about
+          - listitem [ref=e123]:
+            - link "Orçamento" [ref=e124]:
+              - /url: /quote
+          - listitem [ref=e125]:
+            - link "Testimonials" [ref=e126]:
+              - /url: /testimonials
+          - listitem [ref=e127]:
+            - link "Contact" [ref=e128]:
+              - /url: /quote
+          - listitem [ref=e129]:
+            - link "Free Quote" [ref=e130]:
+              - /url: /quote
+    - generic [ref=e133]:
+      - generic [ref=e134]: © 2025 Bubbles Enterprise. All rights reserved.
+      - generic:
+        - link "Facebook":
+          - /url: "#"
+          - img
+        - link "Instagram":
+          - /url: "#"
+          - img
+        - link "LinkedIn":
+          - /url: "#"
+          - img
+      - generic [ref=e138]:
+        - link "Privacy Policy" [ref=e139]:
+          - /url: /privacy
+        - link "Terms of Service" [ref=e140]:
+          - /url: /terms
+```

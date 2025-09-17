@@ -1,0 +1,387 @@
+[
+  {
+    "id": "TC001",
+    "title": "Homepage Load and Responsive Layout",
+    "description": "Verify that the homepage loads within 3 seconds on desktop and mobile devices, and that the layout is responsive and visually correct across various screen sizes.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the homepage URL on a desktop browser."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify homepage loads within 3 seconds."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify hero section, services overview, and local trust indicators render correctly."
+      },
+      {
+        "type": "action",
+        "description": "Repeat navigation on multiple mobile devices and screen sizes."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify layout responsiveness and correctness on mobile screens."
+      }
+    ]
+  },
+  {
+    "id": "TC002",
+    "title": "Service Pages Navigation and Content Verification",
+    "description": "Verify that service area and detailed service pages load correctly and display accurate and complete information about New Construction, Repairs, and Remove & Replace services.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to each service area page (Orlando and other Central Florida cities)."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify service area information is accurate and properly localized."
+      },
+      {
+        "type": "action",
+        "description": "Navigate to detailed services pages for New Construction, Repairs, and Remove & Replace."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify all service descriptions, builder partnership details, and calls to action are displayed."
+      }
+    ]
+  },
+  {
+    "id": "TC003",
+    "title": "Interactive Cost Calculator Accuracy and Performance",
+    "description": "Verify that the cost calculator provides accurate soffit and fascia cost estimates with instant feedback based on user-selected materials and service types, and performs efficiently leveraging WebAssembly.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the cost calculator page."
+      },
+      {
+        "type": "action",
+        "description": "Select different material types from the options provided."
+      },
+      {
+        "type": "action",
+        "description": "Select various service types such as New Construction, Repairs, or Remove & Replace."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that the cost estimate updates instantly upon selection changes."
+      },
+      {
+        "type": "assertion",
+        "description": "Validate that cost outputs match expected calculations based on known pricing rules."
+      },
+      {
+        "type": "assertion",
+        "description": "Monitor performance to ensure no lag beyond acceptable thresholds."
+      }
+    ]
+  },
+  {
+    "id": "TC004",
+    "title": "Quote Request Form Validation and Submission",
+    "description": "Validate that the quote request form correctly validates Central Florida property addresses, supports secure photo uploads, and submits requests successfully with proper confirmations.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the quote request page."
+      },
+      {
+        "type": "action",
+        "description": "Enter an invalid address outside Central Florida."
+      },
+      {
+        "type": "action",
+        "description": "Attempt to submit the form."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify form shows validation error for invalid address."
+      },
+      {
+        "type": "action",
+        "description": "Enter a valid Central Florida address."
+      },
+      {
+        "type": "action",
+        "description": "Select a service type for the quote."
+      },
+      {
+        "type": "action",
+        "description": "Upload multiple supported image files for property photos."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify files upload securely without errors."
+      },
+      {
+        "type": "action",
+        "description": "Submit the form."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify submission success confirmation is displayed and emails/notifications are sent."
+      }
+    ]
+  },
+  {
+    "id": "TC005",
+    "title": "AI Chatbot Functional Responses and Escalation",
+    "description": "Verify that the AI-powered chatbot correctly responds to common customer queries regarding soffit and fascia services and escalates complex queries appropriately.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Invoke chatbot on various pages."
+      },
+      {
+        "type": "action",
+        "description": "Submit common questions about services, pricing, scheduling."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify chatbot provides relevant and accurate answers instantly."
+      },
+      {
+        "type": "action",
+        "description": "Submit complex or uncommon queries."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify chatbot escalates to human support or appropriate fallback mechanism."
+      }
+    ]
+  },
+  {
+    "id": "TC006",
+    "title": "Image Gallery Carousel Functionality and Performance",
+    "description": "Verify the image gallery carousel displays past project photos correctly with optimized loading and smooth navigation controls.",
+    "category": "ui",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the gallery page."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify images load with proper resolution and no broken links."
+      },
+      {
+        "type": "action",
+        "description": "Use carousel navigation controls to browse images."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify smooth transitions and responsiveness."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify carousel is keyboard navigable and accessible."
+      }
+    ]
+  },
+  {
+    "id": "TC007",
+    "title": "SEO Verification and Schema Markup",
+    "description": "Validate the website includes proper local SEO optimizations and schema markup for search engines to increase rankings in Central Florida soffit and fascia services.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Use SEO tools and validators on core pages."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify presence of relevant keywords targeting Central Florida market."
+      },
+      {
+        "type": "assertion",
+        "description": "Validate JSON-LD schema markup is correctly implemented on homepage, services, and local pages."
+      }
+    ]
+  },
+  {
+    "id": "TC008",
+    "title": "Accessibility Compliance to WCAG 2.1 AA",
+    "description": "Test that all pages conform to WCAG 2.1 AA accessibility standards, supporting keyboard navigation, screen readers, and other assistive technologies.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate through the entire site interface using only keyboard."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify all interactive elements are reachable and usable by keyboard."
+      },
+      {
+        "type": "action",
+        "description": "Test site compatibility with popular screen readers."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify correct semantic markup and ARIA attributes provide meaningful screen reader output."
+      },
+      {
+        "type": "action",
+        "description": "Check color contrast and text size compliance on key UI components."
+      }
+    ]
+  },
+  {
+    "id": "TC009",
+    "title": "Security and Spam Protection Monitoring",
+    "description": "Verify AI-based security system properly detects and mitigates spam, bots, and malicious activities across forms and chat systems.",
+    "category": "security",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Simulate spam and bot attacks on quote request form and chatbot."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that security system detects and blocks malicious submissions."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify alerts or logs are generated for administrator review."
+      }
+    ]
+  },
+  {
+    "id": "TC010",
+    "title": "Admin Dashboard Authentication and Content Management",
+    "description": "Verify that admin users can securely log into the dashboard, manage content including gallery photos, testimonials, and service details effectively.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Attempt to access admin dashboard without authentication."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify access is denied and redirected to login."
+      },
+      {
+        "type": "action",
+        "description": "Log in with valid admin credentials."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify successful login and access to dashboard features."
+      },
+      {
+        "type": "action",
+        "description": "Add, edit, and delete gallery images and customer testimonials."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify changes are saved, reflected on the site, and no errors occur."
+      },
+      {
+        "type": "action",
+        "description": "Update service information content."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify content updates visible on relevant pages."
+      }
+    ]
+  },
+  {
+    "id": "TC011",
+    "title": "Cross-browser Compatibility and Mobile Optimization",
+    "description": "Validate that the website functions correctly and displays properly across major browsers and mobile devices.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open the site on latest versions of Chrome, Firefox, Safari, Edge."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify consistent UI layout, navigation, and functionality."
+      },
+      {
+        "type": "action",
+        "description": "Test on multiple mobile devices and browsers."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify responsiveness and touch interactions operate flawlessly."
+      }
+    ]
+  },
+  {
+    "id": "TC012",
+    "title": "Data Privacy Compliance for Forms and Data Handling",
+    "description": "Verify that all forms and data handling on the site comply with GDPR and CCPA privacy policies, including user consent and data protection.",
+    "category": "security",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Submit forms such as quote request and contact forms."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify privacy consent checkboxes are present and required."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify user data is transmitted securely and stored according to privacy policies."
+      },
+      {
+        "type": "action",
+        "description": "Request data access or deletion via site mechanisms."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify system handles privacy requests compliantly."
+      }
+    ]
+  },
+  {
+    "id": "TC013",
+    "title": "Educational Content Accessibility and Accuracy",
+    "description": "Verify educational materials including measurement guides, material comparisons, and maintenance tips are accurate, easily accessible, and user-friendly.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to educational content pages."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify content is complete, clear, and correctly formatted."
+      },
+      {
+        "type": "action",
+        "description": "Test access on desktop and mobile devices."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify readability, links, and downloadable materials function properly."
+      }
+    ]
+  }
+]

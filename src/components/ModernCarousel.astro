@@ -1,0 +1,263 @@
+---
+const projects = [
+  { src: '/images/works/work1.jpeg', alt: 'Professional soffit and fascia project in residential Orlando FL - Bubbles Enterprise' },
+  { src: '/images/works/work2.jpeg', alt: 'Commercial soffit installation services in Orlando FL - Expert contractors' },
+  { src: '/images/works/work3.jpeg', alt: 'Fascia repair project in Winter Park FL - Quality soffit and fascia solutions' },
+  { src: '/images/works/work4.jpeg', alt: 'New construction soffit and fascia installation Orlando FL - Licensed experts' },
+  { src: '/images/works/work5.jpeg', alt: 'Residential soffit replacement in Orlando area - Durable materials guaranteed' },
+  { src: '/images/works/work6.jpeg', alt: 'Soffit design project for homes in Orlando FL - 10+ years experience' },
+  { src: '/images/works/work7.jpeg', alt: 'Residential fascia installation Orlando FL - Professional craftsmanship' },
+  { src: '/images/works/work8.jpeg', alt: 'Commercial soffit services in Winter Park FL - Trusted local contractors' },
+  { src: '/images/works/work9.jpeg', alt: 'Fascia maintenance and repair in Orlando FL - White Aluminum Soffit' },
+  { src: '/images/works/work10.jpeg', alt: 'Complete soffit and fascia project in Orlando FL - Black Soffit Gable' },
+  { src: '/images/works/work11.jpeg', alt: 'Advanced soffit and fascia installation for luxury homes Orlando FL - Ceiling' },
+  { src: '/images/works/work12.jpeg', alt: 'Comprehensive soffit and fascia renovation project Orlando FL  - Remove and Replace Soffit' },
+];
+---
+
+<section class="py-16 lg:py-24 bg-white">
+  <div class="container-custom">
+    <div class="text-center mb-16">
+      <h2 class="text-4xl md:text-5xl font-bold text-neutral-gray-900 mb-6">
+        Our <span class="text-gradient">Project</span> Gallery
+      </h2>
+      <p class="text-xl text-neutral-gray-600 max-w-3xl mx-auto">
+        Explore our latest soffit and fascia projects in Orlando and surrounding areas. Each installation demonstrates Bubbles Enterprise's commitment to quality craftsmanship, durable materials, and customer satisfaction with over 10 years of licensed expertise in Florida.
+      </p>
+    </div>
+
+    <!-- Optimized Project Grid for SEO and Performance -->
+    <div class="project-grid" role="region" aria-label="Soffit and Fascia Project Gallery Orlando FL">
+      {projects.map((project, index) => (
+        <article key={index} class="project-item" itemscope itemtype="https://schema.org/ImageObject">
+          <img
+            src={project.src}
+            alt={project.alt}
+            class="project-image"
+            loading={index < 4 ? 'eager' : 'lazy'}
+            width="400"
+            height="300"
+            itemprop="contentUrl"
+          />
+          <div class="project-overlay">
+            <figcaption class="project-caption" itemprop="caption">{project.alt.split(' - ')[1] || `Project ${index + 1}`}</figcaption>
+          </div>
+        </article>
+      ))}
+    </div>
+
+    <div class="text-center mt-8">
+      <a href="/gallery" class="btn-modern btn-primary inline-flex items-center gap-2" rel="nofollow">
+        View Full Gallery
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- SEO-Optimized Lightbox Modal -->
+<div id="lightboxModal" class="fixed inset-0 bg-black/90 hidden z-50 flex items-center justify-center p-4">
+  <div class="relative w-full h-full max-w-4xl max-h-[90vh]">
+    <!-- Close Button -->
+    <button 
+      id="closeLightbox" 
+      class="absolute top-4 right-4 text-white text-2xl hover:text-gray-300 transition-colors bg-bubble-blue/80 hover:bg-bubble-blue px-4 py-2 rounded"
+      aria-label="Close lightbox gallery"
+    >
+      Close
+    </button>
+    
+    <!-- Navigation -->
+    <button id="prevLightbox" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-white text-4xl hover:text-gray-300" aria-label="Previous image">
+      ‹
+    </button>
+    <button id="nextLightbox" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white text-4xl hover:text-gray-300" aria-label="Next image">
+      ›
+    </button>
+    
+    <!-- Image Container -->
+    <div class="lightbox-container">
+      <img id="lightboxImage" src="" alt="" class="w-full h-full object-contain" />
+    </div>
+    
+    <!-- Caption -->
+    <div id="lightboxCaption" class="absolute bottom-4 left-4 right-4 text-white text-center bg-black/50 p-2 rounded">
+      <p class="text-sm"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+  const lightboxProjects = [
+    { src: '/images/works/work1.jpeg', alt: 'Professional soffit and fascia project in residential Orlando FL - Bubbles Enterprise' },
+    { src: '/images/works/work2.jpeg', alt: 'Commercial soffit installation services in Orlando FL - Expert contractors' },
+    { src: '/images/works/work3.jpeg', alt: 'Fascia repair project in Winter Park FL - Quality soffit and fascia solutions' },
+    { src: '/images/works/work4.jpeg', alt: 'New construction soffit and fascia installation Orlando FL - Licensed experts' },
+    { src: '/images/works/work5.jpeg', alt: 'Residential soffit replacement in Orlando area - Durable materials guaranteed' },
+    { src: '/images/works/work6.jpeg', alt: 'Soffit design project for homes in Orlando FL - 10+ years experience' },
+    { src: '/images/works/work7.jpeg', alt: 'Residential fascia installation Orlando FL - Professional craftsmanship' },
+    { src: '/images/works/work8.jpeg', alt: 'Commercial soffit services in Winter Park FL - Trusted local contractors' },
+    { src: '/images/works/work9.jpeg', alt: 'Fascia maintenance and repair in Orlando FL - Satisfaction guaranteed' },
+    { src: '/images/works/work10.jpeg', alt: 'Complete soffit and fascia project in Orlando FL - Full-service solutions' },
+    { src: '/images/works/work11.jpeg', alt: 'Advanced soffit and fascia installation for luxury homes Orlando' },
+    { src: '/images/works/work12.jpeg', alt: 'Comprehensive soffit and fascia renovation project Orlando FL' },
+  ];
+  
+  let currentLightboxIndex = 0;
+  
+  function openLightbox(index) {
+    currentLightboxIndex = index;
+    updateLightbox();
+    const modal = document.getElementById('lightboxModal');
+    if (modal) {
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+  }
+  
+  function updateLightbox() {
+    const img = document.getElementById('lightboxImage');
+    const caption = document.getElementById('lightboxCaption')?.querySelector('p');
+    const currentProject = lightboxProjects[currentLightboxIndex];
+    
+    if (img && caption) {
+      img.src = currentProject.src;
+      img.alt = currentProject.alt;
+      caption.textContent = currentProject.alt;
+      console.log(`Loading image: ${currentProject.src}`); // Depuração
+    }
+  }
+  
+  function closeLightbox() {
+    const modal = document.getElementById('lightboxModal');
+    if (modal) {
+      modal.classList.add('hidden');
+      document.body.style.overflow = 'auto';
+    }
+  }
+  
+  function nextLightbox() {
+    currentLightboxIndex = (currentLightboxIndex + 1) % lightboxProjects.length;
+    updateLightbox();
+  }
+  
+  function prevLightbox() {
+    currentLightboxIndex = (currentLightboxIndex - 1 + lightboxProjects.length) % lightboxProjects.length;
+    updateLightbox();
+  }
+  
+  document.addEventListener('DOMContentLoaded', () => {
+    const projectItems = document.querySelectorAll('.project-item');
+    projectItems.forEach((item, index) => {
+      const img = item.querySelector('.project-image');
+      if (img) {
+        img.addEventListener('error', () => {
+          console.error(`Failed to load image: ${img.src}`);
+          img.src = 'https://placehold.co/400x300'; // Fallback
+        });
+      }
+      item.addEventListener('click', () => openLightbox(index));
+    });
+    
+    const closeBtn = document.getElementById('closeLightbox');
+    const prevBtn = document.getElementById('prevLightbox');
+    const nextBtn = document.getElementById('nextLightbox');
+    const modal = document.getElementById('lightboxModal');
+    
+    if (closeBtn) closeBtn.addEventListener('click', closeLightbox);
+    if (prevBtn) prevBtn.addEventListener('click', prevLightbox);
+    if (nextBtn) nextBtn.addEventListener('click', nextLightbox);
+    if (modal) {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeLightbox();
+      });
+    }
+    
+    document.addEventListener('keydown', (e) => {
+      if (!modal || modal.classList.contains('hidden')) return;
+      if (e.key === 'Escape') closeLightbox();
+      else if (e.key === 'ArrowLeft') prevLightbox();
+      else if (e.key === 'ArrowRight') nextLightbox();
+    });
+  });
+</script>
+
+<style>
+  /* Optimized Project Grid */
+  .project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+    justify-content: center;
+  }
+  
+  .project-item {
+    position: relative;
+    cursor: pointer;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+  }
+  
+  .project-item:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+  }
+  
+  .project-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+  }
+  
+  .project-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+    color: white;
+    padding: 1rem;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+  }
+  
+  .project-item:hover .project-overlay {
+    transform: translateY(0);
+  }
+  
+  .project-caption {
+    margin: 0;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-align: center;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 640px) {
+    .project-grid {
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 0.5rem;
+    }
+    .project-image {
+      height: 150px;
+    }
+  }
+  
+  /* Lightbox Styles */
+  .lightbox-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+  }
+  
+  .lightbox-container img {
+    max-height: 90vh;
+    max-width: 100%;
+    border-radius: 8px;
+  }
+</style>

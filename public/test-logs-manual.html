@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Manual - Funcionalidades de Logs</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .test-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .test-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #007bff;
+        }
+        .btn-test {
+            margin: 5px;
+            min-width: 150px;
+        }
+        .result-area {
+            background: #1e1e1e;
+            color: #00ff00;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .info { color: #17a2b8; }
+        .warning { color: #ffc107; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="text-center mb-4">
+            <h1><i class="fas fa-vial me-3"></i>Teste Manual - Funcionalidades de Logs</h1>
+            <p class="text-muted">Teste todas as funcionalidades implementadas na página de logs administrativos</p>
+        </div>
+
+        <!-- Teste de Limpeza de Logs -->
+        <div class="test-section">
+            <h3><i class="fas fa-broom me-2"></i>Teste de Limpeza de Logs</h3>
+            <p>Teste os diferentes tipos de limpeza de logs:</p>
+            <div class="d-flex flex-wrap">
+                <button class="btn btn-warning btn-test" onclick="testCleanup('old')">
+                    <i class="fas fa-calendar-times me-2"></i>Limpar Logs Antigos (30+ dias)
+                </button>
+                <button class="btn btn-danger btn-test" onclick="testCleanup('errors')">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Limpar Apenas Erros (4xx/5xx)
+                </button>
+                <button class="btn btn-dark btn-test" onclick="testCleanup('all')">
+                    <i class="fas fa-trash me-2"></i>Limpar Todos os Logs
+                </button>
+            </div>
+            <div id="cleanup-result" class="result-area" style="display: none;"></div>
+        </div>
+
+        <!-- Teste de Exportação -->
+        <div class="test-section">
+            <h3><i class="fas fa-download me-2"></i>Teste de Exportação</h3>
+            <p>Teste a exportação de logs em diferentes formatos:</p>
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Exportação Simples:</h5>
+                    <button class="btn btn-success btn-test" onclick="testExport('json')">
+                        <i class="fas fa-file-code me-2"></i>Exportar JSON
+                    </button>
+                    <button class="btn btn-info btn-test" onclick="testExport('csv')">
+                        <i class="fas fa-file-csv me-2"></i>Exportar CSV
+                    </button>
+                </div>
+                <div class="col-md-6">
+                    <h5>Exportação com Filtros:</h5>
+                    <button class="btn btn-warning btn-test" onclick="testExportFiltered('404')">
+                        <i class="fas fa-filter me-2"></i>Exportar 404 Errors
+                    </button>
+                    <button class="btn btn-danger btn-test" onclick="testExportFiltered('500')">
+                        <i class="fas fa-filter me-2"></i>Exportar 500 Errors
+                    </button>
+                </div>
+            </div>
+            <div id="export-result" class="result-area" style="display: none;"></div>
+        </div>
+
+        <!-- Teste de Busca -->
+        <div class="test-section">
+            <h3><i class="fas fa-search me-2"></i>Teste de Busca e Filtros</h3>
+            <p>Teste a funcionalidade de busca em tempo real:</p>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input type="text" id="search-test" class="form-control" placeholder="Digite para testar busca...">
+                        <button class="btn btn-primary" onclick="testSearch()">
+                            <i class="fas fa-play me-2"></i>Testar Busca
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <button class="btn btn-secondary btn-test" onclick="testQuickFilters()">
+                        <i class="fas fa-filter me-2"></i>Testar Filtros Rápidos
+                    </button>
+                </div>
+            </div>
+            <div id="search-result" class="result-area" style="display: none;"></div>
+        </div>
+
+        <!-- Teste de Performance -->
+        <div class="test-section">
+            <h3><i class="fas fa-tachometer-alt me-2"></i>Teste de Performance</h3>
+            <p>Teste a performance das funcionalidades:</p>
+            <button class="btn btn-primary btn-test" onclick="testPerformance()">
+                <i class="fas fa-stopwatch me-2"></i>Teste de Performance Completo
+            </button>
+            <div id="performance-result" class="result-area" style="display: none;"></div>
+        </div>
+
+        <!-- Status do Servidor -->
+        <div class="test-section">
+            <h3><i class="fas fa-server me-2"></i>Status do Servidor</h3>
+            <p>Verifique se o servidor está rodando:</p>
+            <button class="btn btn-info btn-test" onclick="checkServerStatus()">
+                <i class="fas fa-heartbeat me-2"></i>Verificar Status
+            </button>
+            <div id="server-result" class="result-area" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = 'http://localhost:3001';
+        
+        function log(message, type = 'info', elementId) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type;
+            element.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+            element.scrollTop = element.scrollHeight;
+        }
+
+        function clearLog(elementId) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = '';
+        }
+
+        async function testCleanup(action) {
+            clearLog('cleanup-result');
+            log(`Iniciando teste de limpeza: ${action}`, 'info', 'cleanup-result');
+            
+            try {
+                const response = await fetch(`${BASE_URL}/api/logs/cleanup`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ action })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    log(`✅ Sucesso: ${result.message}`, 'success', 'cleanup-result');
+                    log(`📊 Registros removidos: ${result.deletedCount}`, 'info', 'cleanup-result');
+                } else {
+                    log(`❌ Erro: ${result.message}`, 'error', 'cleanup-result');
+                }
+            } catch (error) {
+                log(`❌ Erro de conexão: ${error.message}`, 'error', 'cleanup-result');
+            }
+        }
+
+        async function testExport(format) {
+            clearLog('export-result');
+            log(`Iniciando exportação em formato: ${format}`, 'info', 'export-result');
+            
+            try {
+                const url = `${BASE_URL}/api/logs/export?format=${format}`;
+                log(`📡 URL de exportação: ${url}`, 'info', 'export-result');
+                
+                const response = await fetch(url);
+                
+                if (response.ok) {
+                    const contentType = response.headers.get('content-type');
+                    log(`✅ Exportação bem-sucedida!`, 'success', 'export-result');
+                    log(`📄 Content-Type: ${contentType}`, 'info', 'export-result');
+                    
+                    // Criar link de download
+                    const blob = await response.blob();
+                    const downloadUrl = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = downloadUrl;
+                    a.download = `logs_export_${new Date().toISOString().split('T')[0]}.${format}`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(downloadUrl);
+                    
+                    log(`💾 Download iniciado automaticamente`, 'success', 'export-result');
+                } else {
+                    const error = await response.json();
+                    log(`❌ Erro na exportação: ${error.message}`, 'error', 'export-result');
+                }
+            } catch (error) {
+                log(`❌ Erro de conexão: ${error.message}`, 'error', 'export-result');
+            }
+        }
+
+        async function testExportFiltered(errorCode) {
+            clearLog('export-result');
+            log(`Testando exportação filtrada para código: ${errorCode}`, 'info', 'export-result');
+            
+            try {
+                const url = `${BASE_URL}/api/logs/export?format=json&error_code=${errorCode}`;
+                const response = await fetch(url);
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    log(`✅ Exportação filtrada bem-sucedida!`, 'success', 'export-result');
+                    log(`📊 Registros encontrados: ${result.count}`, 'info', 'export-result');
+                    log(`🔍 Filtro aplicado: error_code = ${errorCode}`, 'info', 'export-result');
+                } else {
+                    const error = await response.json();
+                    log(`❌ Erro: ${error.message}`, 'error', 'export-result');
+                }
+            } catch (error) {
+                log(`❌ Erro de conexão: ${error.message}`, 'error', 'export-result');
+            }
+        }
+
+        function testSearch() {
+            clearLog('search-result');
+            const searchTerm = document.getElementById('search-test').value;
+            
+            if (!searchTerm) {
+                log('⚠️ Digite um termo de busca primeiro', 'warning', 'search-result');
+                return;
+            }
+            
+            log(`🔍 Testando busca para: "${searchTerm}"`, 'info', 'search-result');
+            log(`📡 Redirecionando para: ${BASE_URL}/admin/logs?instant_search=${encodeURIComponent(searchTerm)}`, 'info', 'search-result');
+            
+            // Abrir em nova aba
+            window.open(`${BASE_URL}/admin/logs?instant_search=${encodeURIComponent(searchTerm)}`, '_blank');
+            
+            log(`✅ Página aberta em nova aba`, 'success', 'search-result');
+        }
+
+        function testQuickFilters() {
+            clearLog('search-result');
+            log('🔧 Testando filtros rápidos...', 'info', 'search-result');
+            
+            const filters = [
+                { name: '404 Errors', url: `${BASE_URL}/admin/logs?error_code=404` },
+                { name: '500 Errors', url: `${BASE_URL}/admin/logs?error_code=500` },
+                { name: 'Suspeitos', url: `${BASE_URL}/admin/logs?suspicious=true` }
+            ];
+            
+            filters.forEach((filter, index) => {
+                setTimeout(() => {
+                    log(`🔗 Abrindo filtro: ${filter.name}`, 'info', 'search-result');
+                    window.open(filter.url, '_blank');
+                }, index * 1000);
+            });
+            
+            log(`✅ Filtros serão abertos em sequência`, 'success', 'search-result');
+        }
+
+        async function testPerformance() {
+            clearLog('performance-result');
+            log('⚡ Iniciando teste de performance...', 'info', 'performance-result');
+            
+            const tests = [
+                { name: 'Carregamento da página', url: `${BASE_URL}/admin/logs` },
+                { name: 'API de exportação', url: `${BASE_URL}/api/logs/export?format=json` },
+                { name: 'Busca com filtro', url: `${BASE_URL}/admin/logs?instant_search=test` }
+            ];
+            
+            for (const test of tests) {
+                const startTime = performance.now();
+                try {
+                    const response = await fetch(test.url);
+                    const endTime = performance.now();
+                    const duration = (endTime - startTime).toFixed(2);
+                    
+                    if (response.ok) {
+                        log(`✅ ${test.name}: ${duration}ms`, 'success', 'performance-result');
+                    } else {
+                        log(`⚠️ ${test.name}: ${duration}ms (Status: ${response.status})`, 'warning', 'performance-result');
+                    }
+                } catch (error) {
+                    const endTime = performance.now();
+                    const duration = (endTime - startTime).toFixed(2);
+                    log(`❌ ${test.name}: ${duration}ms (Erro: ${error.message})`, 'error', 'performance-result');
+                }
+            }
+        }
+
+        async function checkServerStatus() {
+            clearLog('server-result');
+            log('🔍 Verificando status do servidor...', 'info', 'server-result');
+            
+            try {
+                const response = await fetch(`${BASE_URL}/admin/logs`);
+                
+                if (response.ok) {
+                    log('✅ Servidor está rodando normalmente', 'success', 'server-result');
+                    log(`📡 Status: ${response.status} ${response.statusText}`, 'info', 'server-result');
+                    log(`🌐 URL: ${BASE_URL}`, 'info', 'server-result');
+                } else {
+                    log(`⚠️ Servidor respondeu com status: ${response.status}`, 'warning', 'server-result');
+                }
+            } catch (error) {
+                log('❌ Servidor não está acessível', 'error', 'server-result');
+                log(`💡 Certifique-se de que o comando 'npm run dev' está rodando`, 'info', 'server-result');
+                log(`🔧 Erro: ${error.message}`, 'error', 'server-result');
+            }
+        }
+
+        // Verificar status automaticamente ao carregar
+        window.addEventListener('load', () => {
+            setTimeout(checkServerStatus, 1000);
+        });
+    </script>
+</body>
+</html>

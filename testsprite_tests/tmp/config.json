@@ -1,0 +1,16 @@
+{
+  "status": "commited",
+  "type": "frontend",
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:3001",
+  "executionArgs": {
+    "projectName": "Soffit2025Bubble",
+    "projectPath": "C:\\Users\\eDuArDoXP\\Downloads\\Soffit2025Bubble",
+    "testIds": [],
+    "additionalInstruction": "Run comprehensive tests to validate all implemented features including calculator, security system, and optimizations",
+    "envs": {
+      "API_KEY": "sk-user-HGN-rMcVEG8wohoD--IsRLUgrke0y1WbmjKa6TbmepuHTt53CKCHXtrYzLN_CIeQlQno7xQsTezpAE8RUKG0MSGHl-LI4JmHo0H57c6W3pvlIgavxrONtb-4dheTYg5JTeM"
+    }
+  },
+  "proxy": "http://7df2327d-86ff-4ce4-b9d4-ea9ae6de43d8:KeyU0chJWujwofwoDa5EAbGpY8lvqALS@tun.testsprite.com:8080"
+}

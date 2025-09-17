@@ -1,0 +1,1 @@
+import"./hoisted.DV8WBEkX.js";if(window.location.search||window.location.hash){const e=new URL(window.location);e.search="",e.hash="",window.history.replaceState({},document.title,e.pathname)}Date.now().toString(36).toUpperCase();"caches"in window&&caches.keys().then(e=>{e.forEach(e=>{(e.includes("error")||e.includes("500"))&&caches.delete(e)})});

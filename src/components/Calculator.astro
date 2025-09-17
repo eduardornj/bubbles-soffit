@@ -1,0 +1,831 @@
+---
+// Calculator Component for Soffit Estimates
+---
+
+<div class="calculator-container bg-white rounded-2xl shadow-xl p-8 max-w-4xl mx-auto">
+  <!-- Header -->
+  <div class="text-center mb-8">
+    <h2 class="text-3xl font-bold text-blue-900 mb-4">Soffit Calculator</h2>
+    <p class="text-gray-600">Get an instant estimate for your soffit project in Orlando</p>
+  </div>
+
+  <!-- Calculator Form -->
+  <form id="calculator-form" class="space-y-6">
+    <!-- House Measurements -->
+    <div class="grid md:grid-cols-2 gap-6">
+      <div class="space-y-4">
+        <h3 class="text-xl font-semibold text-blue-800 mb-4">House Measurements</h3>
+        
+        <div>
+          <label for="linear-feet" class="block text-sm font-medium text-gray-700 mb-2">
+            Total Linear Feet
+            <a href="/measurement-guide" class="ml-2 text-blue-600 hover:text-blue-800 inline-flex items-center">
+              <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
+              </svg>
+              <span class="text-sm">Measurement Guide</span>
+            </a>
+          </label>
+          <input 
+            type="number" 
+            id="linear-feet" 
+            name="linearFeet"
+            min="10" 
+            max="2000" 
+            step="0.1"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Ex: 160"
+            required
+          >
+          <p class="text-xs text-gray-500 mt-1">Measure the perimeter of your house where soffit will be installed</p>
+        </div>
+        
+        <div>
+          <label for="overhang" class="block text-sm font-medium text-gray-700 mb-2">
+            Overhang Depth (inches)
+            <button 
+              type="button" 
+              class="ml-2 w-5 h-5 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-blue-600 transition-colors"
+              id="overhang-info-modal-btn"
+            >
+              ?
+            </button>
+          </label>
+          <input 
+            type="number" 
+            id="overhang" 
+            name="overhang"
+            min="6" 
+            max="120" 
+            step="1"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Ex: 18"
+            required
+          >
+          <p class="text-xs text-gray-500 mt-1">Distance from wall to fascia board (affects material usage)</p>
+        </div>
+      </div>
+
+      <!-- Installation Type -->
+      <div class="space-y-4">
+        <div class="flex items-center gap-2 mb-4">
+          <h3 class="text-xl font-semibold text-blue-800">Installation Type</h3>
+          <button 
+          type="button" 
+          class="w-5 h-5 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-blue-600 transition-colors"
+          id="installation-info-modal-btn"
+        >
+          ?
+        </button>
+        </div>
+        
+        <!-- Installation Info Tooltip -->
+        <div id="installation-info-tooltip" class="hidden bg-gray-800 text-white text-sm p-3 rounded-lg mb-3 relative">
+          <div class="space-y-2">
+            <div><strong>Installation Types:</strong></div>
+            <div><strong>Soffit and Fascia:</strong> Complete installation with new fascia boards</div>
+            <div><strong>Double J:</strong> Soffit only with J-channel (existing fascia remains)</div>
+          </div>
+          <div class="absolute -top-2 left-6 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-gray-800"></div>
+        </div>
+        
+        <div>
+          <label for="material-type" class="block text-sm font-medium text-gray-700 mb-2">
+            Material Type
+          </label>
+          <select 
+            id="material-type" 
+            name="materialType"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            required
+            onchange="handleMaterialChange()"
+          >
+            <option value="aluminum">Aluminum Soffit</option>
+            <option value="vinyl">Vinyl Soffit</option>
+          </select>
+          <p class="text-xs text-gray-500 mt-1">Choose your preferred material</p>
+        </div>
+        
+        <div>
+          <label for="installation-type" class="block text-sm font-medium text-gray-700 mb-2">
+            Installation Method
+          </label>
+          <select 
+            id="installation-type" 
+            name="installationType"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            required
+          >
+            <option value="soffit_fascia">Soffit and Fascia</option>
+            <option value="double_j">Double J (No Fascia)</option>
+          </select>
+          <p class="text-xs text-gray-500 mt-1">Choose your preferred installation method</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Project Details -->
+    <div class="grid md:grid-cols-2 gap-6">
+      <div>
+        <label for="service-type" class="block text-sm font-medium text-gray-700 mb-2">
+          Service Type
+        </label>
+        <select 
+          id="service-type" 
+          name="serviceType"
+          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          required
+        >
+          <option value="remove_replace">Remove and Replace</option>
+          <option value="new_construction">New Construction</option>
+          <option value="repair">Repair</option>
+        </select>
+      </div>
+      
+      <div>
+        <label for="zip-code" class="block text-sm font-medium text-gray-700 mb-2">
+          Zip Code (Orlando)
+        </label>
+        <input 
+          type="text" 
+          id="zip-code" 
+          name="zipCode"
+          pattern="[0-9]{5}"
+          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          placeholder="32801"
+          required
+        >
+      </div>
+    </div>
+
+    <!-- Discount Code Section -->
+    <div class="grid md:grid-cols-2 gap-6">
+      <div>
+        <label for="discount-code" class="block text-sm font-medium text-gray-700 mb-2">
+          Discount Code (Optional)
+        </label>
+        <input 
+          type="text" 
+          id="discount-code" 
+          name="discountCode"
+          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          placeholder="Enter discount code"
+        >
+        <p class="text-xs text-gray-500 mt-1">Have a promo code? Enter it here for additional savings</p>
+      </div>
+      <div class="flex items-end">
+        <div class="bg-blue-50 p-4 rounded-lg w-full">
+          <h4 class="font-medium text-blue-900 mb-2">💡 Savings Tip:</h4>
+          <p class="text-sm text-blue-800">Volume discount automatically applied for projects over 290 linear feet!</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Calculate Button -->
+    <div class="text-center">
+      <button 
+        type="submit" 
+        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-8 rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl"
+      >
+        Calculate Estimate
+      </button>
+    </div>
+  </form>
+
+  <!-- Results Section -->
+  <div id="results" class="hidden mt-8">
+    <div class="border-t pt-8">
+      <h3 class="text-2xl font-bold text-blue-900 mb-6 text-center">Cost Estimates</h3>
+      
+      <!-- Project Summary -->
+      <div class="grid md:grid-cols-3 gap-4 mb-6">
+        <div class="bg-blue-50 rounded-lg p-4 text-center">
+          <span class="text-sm text-blue-600 font-medium">Total Linear Feet</span>
+          <div id="linear-feet-display" class="text-2xl font-bold text-blue-900">0</div>
+        </div>
+        <div class="bg-green-50 rounded-lg p-4 text-center">
+          <span class="text-sm text-green-600 font-medium">Overhang Depth</span>
+          <div id="overhang-display" class="text-2xl font-bold text-green-900">0 in</div>
+        </div>
+        <div class="bg-purple-50 rounded-lg p-4 text-center">
+          <span class="text-sm text-purple-600 font-medium">Installation Type</span>
+          <div id="installation-display" class="text-lg font-bold text-purple-900">-</div>
+        </div>
+      </div>
+      
+      <!-- Material Options -->
+      <div id="material-options" class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Material cards will be inserted here by JavaScript -->
+      </div>
+      
+      <!-- Volume Discount Notice -->
+      <div id="volume-discount" class="hidden mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+        <div class="flex items-center">
+          <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+          </svg>
+          <span class="text-green-800 font-medium">Volume Discount Applied (5%)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error Messages -->
+  <div id="error-messages" class="hidden mt-4">
+    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+      <div class="flex">
+        <svg class="w-5 h-5 text-red-400 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+        </svg>
+        <div>
+          <h4 class="text-red-800 font-medium mb-2">Validation Errors:</h4>
+          <ul id="error-list" class="text-red-700 text-sm space-y-1">
+            <!-- Error messages will be inserted here -->
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Estimate Form Section -->
+  <div id="estimate-form-section" class="hidden mt-12 border-t pt-8">
+    <div class="bg-white rounded-2xl shadow-xl p-8">
+      <div class="text-center mb-8">
+        <h3 class="font-display font-bold text-3xl text-blue-900 mb-4">
+          Send This Estimate to Your Email
+        </h3>
+        <p class="text-lg text-gray-600">
+          Get a detailed quote with your calculated measurements and pricing
+        </p>
+      </div>
+
+      <form id="estimate-form" class="space-y-6" action="/api/estimate" method="POST">
+        <!-- Honeypot field (hidden from users) -->
+        <input type="text" name="website" style="display: none;" tabindex="-1" autocomplete="off" />
+        
+        <!-- Hidden fields for calculated data -->
+        <input type="hidden" id="calc-linear-feet" name="linearFeet" value="">
+        <input type="hidden" id="calc-overhang" name="overhang" value="">
+        <input type="hidden" id="calc-installation-type" name="installationType" value="">
+        <input type="hidden" id="calc-material-type" name="materialType" value="">
+        <input type="hidden" id="calc-service-type" name="serviceType" value="">
+        <input type="hidden" id="calc-zip-code" name="zipCode" value="">
+        <input type="hidden" id="calc-total-price" name="totalPrice" value="">
+        <input type="hidden" id="calc-material-options" name="materialOptions" value="">
+
+        <!-- Contact Information -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label for="est-firstName" class="block text-sm font-medium text-gray-700 mb-2">
+              First Name *
+            </label>
+            <input 
+              type="text" 
+              id="est-firstName" 
+              name="firstName" 
+              required 
+              minlength="2"
+              maxlength="50"
+              pattern="[A-Za-z\s]+"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              placeholder="Your first name"
+            >
+          </div>
+          <div>
+            <label for="est-lastName" class="block text-sm font-medium text-gray-700 mb-2">
+              Last Name *
+            </label>
+            <input 
+              type="text" 
+              id="est-lastName" 
+              name="lastName" 
+              required 
+              minlength="2"
+              maxlength="50"
+              pattern="[A-Za-z\s]+"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              placeholder="Your last name"
+            >
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label for="est-email" class="block text-sm font-medium text-gray-700 mb-2">
+              Email Address *
+            </label>
+            <input 
+              type="email" 
+              id="est-email" 
+              name="email" 
+              required 
+              maxlength="100"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              placeholder="your.email@example.com"
+            >
+          </div>
+          <div>
+            <label for="est-phone" class="block text-sm font-medium text-gray-700 mb-2">
+              Phone Number *
+            </label>
+            <input 
+              type="tel" 
+              id="est-phone" 
+              name="phone" 
+              required 
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              placeholder="(407) 715-1790"
+            >
+          </div>
+        </div>
+
+        <!-- Property Address -->
+        <div>
+          <label for="est-address" class="block text-sm font-medium text-gray-700 mb-2">
+            Property Address *
+          </label>
+          <input 
+            type="text" 
+            id="est-address" 
+            name="address" 
+            required 
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+            placeholder="123 Main St, Orlando, FL 32801"
+          >
+        </div>
+
+        <!-- Additional Notes -->
+        <div>
+          <label for="est-notes" class="block text-sm font-medium text-gray-700 mb-2">
+            Additional Notes (Optional)
+          </label>
+          <textarea 
+            id="est-notes" 
+            name="notes" 
+            rows="3" 
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+            placeholder="Any additional information about your project..."
+          ></textarea>
+        </div>
+
+        <!-- Preferred Contact Method -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-3">
+            Preferred Contact Method
+          </label>
+          <div class="flex flex-wrap gap-4">
+            <label class="flex items-center">
+              <input type="radio" name="contactMethod" value="phone" class="mr-2 text-blue-600 focus:ring-blue-500">
+              <span class="text-gray-700">Phone Call</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" name="contactMethod" value="email" class="mr-2 text-blue-600 focus:ring-blue-500" checked>
+              <span class="text-gray-700">Email</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" name="contactMethod" value="text" class="mr-2 text-blue-600 focus:ring-blue-500">
+              <span class="text-gray-700">Text Message</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="pt-6">
+          <button 
+            type="submit" 
+            id="estSubmitBtn"
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-8 rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <span id="estSubmitText">Send Detailed Estimate</span>
+            <span id="estSubmitLoader" class="hidden">Sending...</span>
+          </button>
+          
+          <!-- Success/Error Messages -->
+          <div id="estFormMessage" class="hidden p-4 rounded-lg mt-4"></div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Installation Info Modal -->
+  <div id="installation-info-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full modal-mobile scroll-smooth-ios">
+      <div class="p-8">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-2xl font-bold text-blue-900">Installation Types Explained</h3>
+          <button id="close-installation-modal" class="text-gray-400 hover:text-gray-600 transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+        
+        <div class="space-y-6">
+          <div class="border-l-4 border-blue-500 pl-6">
+            <h4 class="text-xl font-semibold text-gray-800 mb-3">Soffit Only</h4>
+            <p class="text-gray-600 mb-3">Replace only the horizontal soffit panels under the roof eaves. This option is ideal when your fascia boards are in good condition and only the soffit needs replacement.</p>
+            <div class="bg-blue-50 p-4 rounded-lg">
+              <p class="text-sm text-blue-800"><strong>Best for:</strong> Homes where fascia is recently installed or in excellent condition</p>
+              <p class="text-sm text-blue-800"><strong>Cost:</strong> Most economical option</p>
+            </div>
+          </div>
+          
+          <div class="border-l-4 border-green-500 pl-6">
+            <h4 class="text-xl font-semibold text-gray-800 mb-3">Soffit and Fascia</h4>
+            <p class="text-gray-600 mb-3">Complete replacement of both soffit panels and vertical fascia boards. This provides a uniform appearance and ensures both components are new and properly matched.</p>
+            <div class="bg-green-50 p-4 rounded-lg">
+              <p class="text-sm text-green-800"><strong>Best for:</strong> Complete home renovations or when both components need replacement</p>
+              <p class="text-sm text-green-800"><strong>Cost:</strong> Mid-range option with best overall value</p>
+            </div>
+          </div>
+          
+          <div class="border-l-4 border-purple-500 pl-6">
+            <h4 class="text-xl font-semibold text-gray-800 mb-3">Double J (Aluminum Only)</h4>
+            <p class="text-gray-600 mb-3">Premium installation method using J-channel trim for a professional, finished appearance. This method provides the cleanest lines and most durable installation.</p>
+            <div class="bg-purple-50 p-4 rounded-lg">
+              <p class="text-sm text-purple-800"><strong>Best for:</strong> High-end homes wanting the most professional appearance</p>
+              <p class="text-sm text-purple-800"><strong>Cost:</strong> Premium option with superior aesthetics</p>
+              <p class="text-sm text-purple-800"><strong>Note:</strong> Only available with aluminum material</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-8 bg-gray-50 p-6 rounded-lg">
+          <h5 class="font-semibold text-gray-800 mb-3">💡 Not sure which option is right for you?</h5>
+          <p class="text-gray-600 mb-4">Our experts can help you choose the best installation type based on your home's current condition, budget, and aesthetic goals.</p>
+          <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors">
+            Schedule Free Consultation
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Overhang Depth Info Modal -->
+<div id="overhang-info-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto modal-mobile scroll-smooth-ios">
+    <div class="p-6">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-2xl font-bold text-blue-900">Understanding Overhang Depth</h3>
+        <button id="close-overhang-modal" class="text-gray-400 hover:text-gray-600 transition-colors">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      
+      <div class="space-y-6">
+        <div class="border-l-4 border-blue-500 pl-6">
+          <h4 class="text-xl font-semibold text-gray-800 mb-3">What is Overhang Depth?</h4>
+          <p class="text-gray-600 mb-3">Overhang depth is the horizontal distance from your house wall to the fascia board (the edge of your roof). This measurement is crucial for determining the correct amount of soffit material needed.</p>
+        </div>
+        
+        <div class="bg-blue-50 p-6 rounded-lg">
+          <h5 class="font-semibold text-blue-800 mb-4">📏 Common Overhang Depths:</h5>
+          <div class="space-y-3">
+            <div class="flex justify-between items-center">
+              <span class="font-medium text-blue-700">12-16 inches:</span>
+              <span class="text-blue-600">Standard residential homes</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="font-medium text-blue-700">18-24 inches:</span>
+              <span class="text-blue-600">Wider overhangs, common in newer homes</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="font-medium text-blue-700">24+ inches:</span>
+              <span class="text-blue-600">Deep overhangs, architectural features</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="border-l-4 border-green-500 pl-6">
+          <h4 class="text-xl font-semibold text-gray-800 mb-3">Why Does This Matter?</h4>
+          <p class="text-gray-600 mb-3">Soffit panels are typically 16 inches wide. Your overhang depth determines:</p>
+          <ul class="list-disc list-inside text-gray-600 space-y-1 ml-4">
+            <li>How much material coverage you need</li>
+            <li>Whether panels need to be cut to size</li>
+            <li>The overall cost of your project</li>
+            <li>Installation complexity and time</li>
+          </ul>
+        </div>
+        
+        <div class="bg-yellow-50 p-6 rounded-lg">
+          <h5 class="font-semibold text-yellow-800 mb-3">📐 How to Measure:</h5>
+          <ol class="list-decimal list-inside text-yellow-700 space-y-2">
+            <li>Stand at the corner of your house</li>
+            <li>Measure from the exterior wall to the fascia board</li>
+            <li>Take measurements at multiple points for accuracy</li>
+            <li>Use the average if measurements vary slightly</li>
+          </ol>
+        </div>
+      </div>
+      
+      <div class="mt-8 bg-gray-50 p-6 rounded-lg">
+        <h5 class="font-semibold text-gray-800 mb-3">💡 Need Help Measuring?</h5>
+        <p class="text-gray-600 mb-4">Our team can provide a free on-site measurement to ensure accuracy and provide the most precise estimate for your project.</p>
+        <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors">
+          Schedule Free Measurement
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Register calculator script for lazy loading
+  if (typeof window !== 'undefined' && window.LazyScriptLoader) {
+    window.LazyScriptLoader.registerScript('calculator', {
+      priority: 'interaction',
+      triggers: ['#calculator-form', 'input', 'select', 'button'],
+      callback: function() {
+        initializeCalculatorModule();
+      }
+    });
+  } else {
+    // Fallback for when lazy loader is not available
+    document.addEventListener('DOMContentLoaded', function() {
+      initializeCalculatorModule();
+    });
+  }
+  
+  async function initializeCalculatorModule() {
+    // Dynamic import of calculator utility
+    const { default: SoffitCalculator } = await import('../utils/calculator.js');
+    
+    // Initialize calculator
+    const calculator = new SoffitCalculator();
+    
+    // Toggle installation info modal
+    window.toggleInstallationInfoModal = function() {
+      const modal = document.getElementById('installation-info-modal');
+      modal.classList.toggle('hidden');
+    }
+    
+    // Toggle overhang info modal
+    window.toggleOverhangInfoModal = function() {
+      const modal = document.getElementById('overhang-info-modal');
+      modal.classList.toggle('hidden');
+    }
+    
+    // Handle material type change
+    window.handleMaterialChange = function() {
+      const materialSelect = document.getElementById('material-type');
+      const installationSelect = document.getElementById('installation-type');
+      const doubleJOption = installationSelect.querySelector('option[value="double_j"]');
+      
+      if (materialSelect.value === 'vinyl') {
+        // Hide Double J option for vinyl
+        doubleJOption.style.display = 'none';
+        doubleJOption.disabled = true;
+        // If Double J was selected, switch to Soffit and Fascia
+        if (installationSelect.value === 'double_j') {
+          installationSelect.value = 'soffit_fascia';
+        }
+      } else {
+        // Show Double J option for other materials
+        doubleJOption.style.display = 'block';
+        doubleJOption.disabled = false;
+      }
+    }
+    
+    // DOM elements
+    const form = document.getElementById('calculator-form');
+    const results = document.getElementById('results');
+    const errorMessages = document.getElementById('error-messages');
+    const linearFeetDisplay = document.getElementById('linear-feet-display');
+    const overhangDisplay = document.getElementById('overhang-display');
+    const installationDisplay = document.getElementById('installation-display');
+    const materialOptions = document.getElementById('material-options');
+    const volumeDiscount = document.getElementById('volume-discount');
+    const errorList = document.getElementById('error-list');
+    
+    // Help buttons
+    const measurementHelp = document.getElementById('measurement-help');
+    const overhangHelp = document.getElementById('overhang-help');
+    
+    // Initialize all functionality
+     // Help button event listeners
+     if (measurementHelp) {
+       measurementHelp.addEventListener('click', function() {
+         alert('How to measure linear feet:\n\n1. Measure the perimeter of your house where soffit will be installed\n2. Include all eaves, overhangs, and areas needing soffit\n3. Do not include gable ends unless they also need soffit\n4. Add all measurements together for total linear feet');
+       });
+     }
+     
+     if (overhangHelp) {
+       overhangHelp.addEventListener('click', function() {
+         alert('Overhang depth explanation:\n\nThis is the distance from your house wall to the fascia board (edge of roof).\n\nCommon depths:\n• 12-16 inches: Standard residential\n• 18-24 inches: Wider overhangs\n• 24+ inches: Deep overhangs\n\nThis affects material usage because soffit panels are 16" wide.');
+       });
+     }
+     
+     const installationInfoBtn = document.getElementById('installation-info-modal-btn');
+    const closeModalBtn = document.getElementById('close-installation-modal');
+    const modal = document.getElementById('installation-info-modal');
+    const overhangInfoBtn = document.getElementById('overhang-info-modal-btn');
+    const closeOverhangModalBtn = document.getElementById('close-overhang-modal');
+    const overhangModal = document.getElementById('overhang-info-modal');
+    
+    // Modal event listeners
+    if (installationInfoBtn) {
+      installationInfoBtn.addEventListener('click', window.toggleInstallationInfoModal);
+    }
+    
+    if (closeModalBtn) {
+      closeModalBtn.addEventListener('click', window.toggleInstallationInfoModal);
+    }
+    
+    // Close modal when clicking outside
+    if (modal) {
+      modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+          window.toggleInstallationInfoModal();
+        }
+      });
+    }
+    
+    // Overhang modal event listeners
+    if (overhangInfoBtn) {
+      overhangInfoBtn.addEventListener('click', window.toggleOverhangInfoModal);
+    }
+    
+    if (closeOverhangModalBtn) {
+      closeOverhangModalBtn.addEventListener('click', window.toggleOverhangInfoModal);
+    }
+    
+    // Close overhang modal when clicking outside
+    if (overhangModal) {
+      overhangModal.addEventListener('click', function(e) {
+        if (e.target === overhangModal) {
+          window.toggleOverhangInfoModal();
+        }
+      });
+    }
+    
+    // Initialize material change handler
+    window.handleMaterialChange();
+    
+    // Handle estimate form submission
+    const estimateForm = document.getElementById('estimate-form');
+    if (estimateForm) {
+      estimateForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(estimateForm);
+        
+        try {
+          const response = await fetch('/api/estimate', {
+            method: 'POST',
+            body: formData
+          });
+          
+          const result = await response.json();
+          
+          if (result.success) {
+            // Redirect to thank you page
+            window.location.href = '/thank-you';
+          } else {
+            alert('Error sending estimate: ' + (result.message || 'Please try again'));
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          alert('Error sending estimate. Please try again.');
+        }
+      });
+    }
+    
+    // Form submission
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Clear previous results and errors
+      results.classList.add('hidden');
+      errorMessages.classList.add('hidden');
+      
+      // Get form data
+      const formData = new FormData(form);
+      const overhangInches = parseFloat(formData.get('overhang'));
+      const data = {
+        linearFeet: parseFloat(formData.get('linearFeet')),
+        overhang: overhangInches / 12, // Convert inches to feet for calculations
+        overhangInches: overhangInches, // Keep original inches for display
+        installationType: formData.get('installationType'),
+        materialType: formData.get('materialType'),
+        serviceType: formData.get('serviceType'),
+        zipCode: formData.get('zipCode'),
+        discountCode: formData.get('discountCode')
+      };
+      
+      // Validate measurements
+      const validation = calculator.validateMeasurements(
+        data.linearFeet, 
+        data.overhang
+      );
+      
+      // Validate ZIP code
+      const zipValid = calculator.validateZipCode(data.zipCode);
+      if (!zipValid) {
+        validation.errors.push('Zip Code must be valid for Orlando (32000-34999)');
+        validation.isValid = false;
+      }
+      
+      if (!validation.isValid) {
+        showErrors(validation.errors);
+        return;
+      }
+      
+      // Calculate material options
+      const projectDetails = {
+        serviceType: data.serviceType,
+        zipCode: data.zipCode,
+        propertyType: 'residential'
+      };
+      
+      const options = calculator.calculateMaterialOptions(
+        data.linearFeet, 
+        data.overhang, 
+        data.installationType, 
+        data.materialType,
+        projectDetails
+      );
+      
+      // Display results
+      displayResults(data.linearFeet, data.overhang, data.installationType, options, data.overhangInches);
+    });
+    
+    function showErrors(errors) {
+      errorList.innerHTML = errors.map(error => `<li>• ${error}</li>`).join('');
+      errorMessages.classList.remove('hidden');
+    }
+    
+    function displayResults(linearFeet, overhang, installationType, options, overhangInches) {
+      // Display project details
+      linearFeetDisplay.textContent = `${linearFeet.toFixed(2)} ft`;
+      overhangDisplay.textContent = `${overhangInches.toFixed(0)} in`;
+      installationDisplay.textContent = installationType === 'soffit_fascia' ? 'Soffit and Fascia' : 'Double J';
+      
+      // Display material options
+      materialOptions.innerHTML = options.map(option => {
+        const material = option.material;
+        const estimate = option.estimate;
+        
+        return `
+          <div class="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
+            <h4 class="font-semibold text-lg text-gray-900 mb-2 capitalize">
+              ${material.name.replace('_', ' ')}
+            </h4>
+            <p class="text-sm text-gray-600 mb-4">${material.description}</p>
+            
+            <div class="text-center py-6">
+              <div class="text-3xl font-bold text-blue-600 mb-2">
+                ${calculator.formatCurrency(estimate.finalTotal)}
+              </div>
+              <div class="text-sm text-gray-500">
+                Complete installation price
+              </div>
+              ${estimate.volumeDiscountApplied ? `
+                <div class="mt-2 text-sm text-green-600 font-medium">
+                  ✓ Volume discount applied
+                </div>
+              ` : ''}
+            </div>
+            
+            <div class="border-t pt-4">
+              <div class="text-xs text-gray-500 text-center">
+                ${calculator.formatCurrency(option.costPerYear)}/year over ${material.durabilityYears} years
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      // Show volume discount notice if applicable
+      if (options[0].estimate.volumeDiscountApplied) {
+        volumeDiscount.classList.remove('hidden');
+      }
+      
+      // Show results
+      results.classList.remove('hidden');
+      
+      // Show estimate form and populate hidden fields
+      const estimateFormSection = document.getElementById('estimate-form-section');
+      estimateFormSection.classList.remove('hidden');
+      
+      // Populate hidden fields with calculated data
+      document.getElementById('calc-linear-feet').value = linearFeet;
+      document.getElementById('calc-overhang').value = overhang;
+      document.getElementById('calc-installation-type').value = installationType;
+      document.getElementById('calc-material-type').value = document.getElementById('material-type').value;
+      document.getElementById('calc-service-type').value = document.getElementById('service-type').value;
+      document.getElementById('calc-zip-code').value = document.getElementById('zip-code').value;
+      document.getElementById('calc-total-price').value = options[0].estimate.finalTotal;
+      document.getElementById('calc-material-options').value = JSON.stringify(options);
+    }
+  }
+</script>
+
+<style>
+  .calculator-container {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  }
+</style>

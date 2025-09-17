@@ -1,0 +1,44 @@
+{
+  "name": "bubbles-enterprise-2025",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Bubbles Enterprise - Modern Construction Website 2025",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "build:wasm": "wasm-pack build --target web --out-dir pkg rust-calculator",
+    "build:production": "node build-production.js"
+  },
+  "dependencies": {
+    "@astrojs/node": "^8.3.4",
+    "@astrojs/react": "^3.6.3",
+    "@astrojs/sitemap": "^3.5.1",
+    "@astrojs/tailwind": "^5.1.0",
+    "@types/react": "^18.3.24",
+    "@types/react-dom": "^18.3.7",
+    "astro": "^4.2.1",
+    "better-sqlite3": "^12.2.0",
+    "dotenv": "^17.2.2",
+    "kysely": "^0.28.7",
+    "lucide-react": "^0.542.0",
+    "mysql2": "^3.14.5",
+    "node-fetch": "^3.3.2",
+    "puppeteer": "^24.21.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "swiper": "^12.0.1",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5.3.3",
+    "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "@tailwindcss/typography": "^0.5.10",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.33",
+    "terser": "^5.44.0"
+  }
+}

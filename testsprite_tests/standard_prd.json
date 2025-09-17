@@ -1,0 +1,185 @@
+{
+  "meta": {
+    "project": "Bubbles Enterprise - Soffit & Fascia Solutions Website",
+    "date": "2025-09-13",
+    "prepared_by": "AI Assistant"
+  },
+  "product_overview": "Bubbles Enterprise is a specialized soffit and fascia contractor serving Orlando and Central Florida since 2014. The website serves to educate homeowners and builders on soffit and fascia solutions, showcase services, provide an interactive cost calculator, enable quote requests, and establish Bubbles Enterprise as the local market leader in soffit and fascia services.",
+  "core_goals": [
+    "Generate qualified leads for soffit and fascia services in Central Florida",
+    "Establish Bubbles Enterprise as the authoritative brand in soffit and fascia solutions",
+    "Educate customers about the importance and maintenance of soffit and fascia systems",
+    "Showcase detailed service offerings: New Construction, Remove & Replace, Repairs",
+    "Dominate local market presence in Orlando and surrounding Central Florida cities"
+  ],
+  "key_features": [
+    "Homepage with hero section, service overview, and local trust indicators",
+    "Service area pages covering Orlando and key Central Florida cities",
+    "Detailed services pages for New Construction, Repairs, and Remove & Replace with builder partnerships",
+    "Interactive cost calculator leveraging WebAssembly for fast soffit and fascia cost estimation",
+    "Quote request system with property address validation, service selection, photo upload, and scheduling integration",
+    "Educational content including measurement guides, material comparisons, and maintenance tips",
+    "AI-powered chatbot integration for customer support and inquiries",
+    "Image gallery showcasing past projects with optimized carousel displays",
+    "Customer testimonials section for social proof",
+    "Admin dashboard for content and system management",
+    "Security system for AI-based monitoring and bot protection",
+    "SEO optimized with schema markup and local SEO focus"
+  ],
+  "user_flow_summary": [
+    "User lands on homepage and views hero section highlighting core services and local expertise",
+    "User navigates to service area or services pages to learn detailed information",
+    "User accesses the cost calculator to generate preliminary soffit and fascia estimates by selecting materials and service types",
+    "User submits a quote request through a comprehensive contact form including address validation and photo upload",
+    "User interacts with AI chatbot for instant support and answers",
+    "Admin users log into the dashboard for managing content including gallery photos, testimonials, and service details",
+    "Site visitors access educational materials and measurement guides enabling informed decisions"
+  ],
+  "validation_criteria": [
+    "Homepage loads within 3 seconds on mobile and desktop with proper responsive layout",
+    "Cost calculator provides accurate estimates with instant feedback and material/service selection",
+    "Quote request form validates Central Florida addresses and handles file uploads securely",
+    "SEO meets local search keyword rankings and includes schema markup",
+    "Accessibility conforms to WCAG 2.1 AA standards with keyboard navigation and screen reader compatibility",
+    "All forms and data handling comply with GDPR and CCPA privacy policies",
+    "AI chatbot responds correctly to common customer queries and escalates as needed",
+    "Admin dashboard allows secure updates to content, gallery, and testimonials",
+    "Security monitoring protects from spam and malicious activity",
+    "Cross-browser compatibility and mobile optimization verified"
+  ],
+  "code_summary": {
+    "tech_stack": [
+      "TypeScript",
+      "JavaScript",
+      "Astro",
+      "React",
+      "Tailwind CSS",
+      "Node.js",
+      "Swiper.js",
+      "Lucide React",
+      "Rust",
+      "WebAssembly",
+      "HTML5",
+      "CSS3"
+    ],
+    "features": [
+      {
+        "name": "Homepage",
+        "description": "Main landing page with hero section, services overview, and company information",
+        "files": [
+          "src/pages/index.astro",
+          "src/layouts/BaseLayout.astro"
+        ]
+      },
+      {
+        "name": "Cost Calculator",
+        "description": "Interactive calculator for soffit and fascia cost estimation with WebAssembly performance",
+        "files": [
+          "src/pages/calculator.astro",
+          "src/components/Calculator.astro",
+          "src/utils/calculator.js",
+          "public/js/calculator.js",
+          "src/rust-calculator/"
+        ]
+      },
+      {
+        "name": "Services Pages",
+        "description": "Detailed service pages for new construction, repairs, and remove & replace",
+        "files": [
+          "src/pages/services.astro",
+          "src/pages/services/new-construction.astro",
+          "src/pages/services/repairs.astro",
+          "src/pages/services/remove-replace.astro",
+          "src/components/ServicesSection.astro",
+          "src/components/ServiceCard.astro"
+        ]
+      },
+      {
+        "name": "Quote Request System",
+        "description": "Contact form for requesting quotes and consultations with file upload support",
+        "files": [
+          "src/pages/quote.astro",
+          "src/pages/thank-you.astro",
+          "src/pages/api/contact.js"
+        ]
+      },
+      {
+        "name": "AI Chatbot Integration",
+        "description": "Grok AI chatbot integration for customer support and instant assistance",
+        "files": [
+          "src/components/ChatBotWrapper.astro",
+          "src/components/FeaturedChatBotWrapper.astro",
+          "src/pages/api/chat.ts"
+        ]
+      },
+      {
+        "name": "Navigation System",
+        "description": "Site navigation with header, footer, and breadcrumbs for responsive design",
+        "files": [
+          "src/components/Header.astro",
+          "src/components/Navigation.astro",
+          "src/components/Footer.astro"
+        ]
+      },
+      {
+        "name": "Image Gallery",
+        "description": "Modern carousel and optimized image components for showcasing work",
+        "files": [
+          "src/components/Gallery.astro",
+          "src/pages/gallery.astro"
+        ]
+      },
+      {
+        "name": "Legal Pages",
+        "description": "Privacy policy, terms of service, and legal compliance pages",
+        "files": [
+          "src/pages/privacy.astro",
+          "src/pages/terms.astro"
+        ]
+      },
+      {
+        "name": "About Page",
+        "description": "Company information, team details, and business credentials",
+        "files": [
+          "src/pages/about.astro"
+        ]
+      },
+      {
+        "name": "Customer Testimonials",
+        "description": "Customer reviews and testimonials display system",
+        "files": [
+          "src/pages/testimonials.astro"
+        ]
+      },
+      {
+        "name": "Educational Content",
+        "description": "Measurement guides and educational resources for customers",
+        "files": [
+          "src/pages/measurement-guide.astro"
+        ]
+      },
+      {
+        "name": "Security System",
+        "description": "AI-powered security monitoring and bot protection system",
+        "files": [
+          "src/pages/api/security-monitor.js",
+          "src/pages/api/ai-security.js"
+        ]
+      },
+      {
+        "name": "Email System",
+        "description": "Email utilities for contact forms and notifications",
+        "files": [
+          "src/utils/email.js"
+        ]
+      },
+      {
+        "name": "Admin Dashboard",
+        "description": "Administrative interface for content and system management",
+        "files": [
+          "src/pages/admin/"
+        ]
+      }
+    ]
+  }
+}

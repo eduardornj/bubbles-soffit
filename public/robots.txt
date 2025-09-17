@@ -1,0 +1,18 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://bubblesenterprise.com/sitemap.xml
+
+# Disallow crawling of admin or private areas (if any)
+# Disallow: /admin/
+# Disallow: /private/
+
+# Allow crawling of important pages
+Allow: /calculator
+Allow: /about
+Allow: /services
+Allow: /contact
+
+# Crawl-delay (optional, helps with server load)
+Crawl-delay: 1

@@ -1,0 +1,2169 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdminSidebar from '../../components/AdminSidebar.astro';
+
+// Acesso direto aos logs sem verificação de sessão
+
+// Parâmetros de busca
+const url = new URL(Astro.request.url);
+const searchParams = {
+  page: parseInt(url.searchParams.get('page') || '1'),
+  limit: parseInt(url.searchParams.get('limit') || '50'),
+  error_code: url.searchParams.get('error_code') || '',
+  start_date: url.searchParams.get('start_date') || '',
+  end_date: url.searchParams.get('end_date') || '',
+  client_ip: url.searchParams.get('client_ip') || '',
+  requested_path: url.searchParams.get('requested_path') || '',
+  user_agent: url.searchParams.get('user_agent') || '',
+  is_suspicious: url.searchParams.get('is_suspicious') || '',
+  instant_search: url.searchParams.get('instant_search') || ''
+};
+
+// Conectar ao MySQL e buscar logs reais
+import mysql from 'mysql2/promise';
+
+const dbConfig = {
+  host: 'localhost',
+  user: 'root',
+  password: 'Cocacola10',
+  database: 'bubbles_enterprise'
+};
+
+// Função buildFilteredQuery que estava faltando
+function buildFilteredQuery(searchParams) {
+  let query = 'SELECT * FROM logs_error WHERE 1=1';
+  const queryParams = [];
+
+  if (searchParams.error_code) {
+    query += ' AND error_code = ?';
+    queryParams.push(searchParams.error_code);
+  }
+
+  if (searchParams.start_date) {
+    query += ' AND timestamp >= ?';
+    queryParams.push(searchParams.start_date);
+  }
+
+  if (searchParams.end_date) {
+    query += ' AND timestamp <= ?';
+    queryParams.push(searchParams.end_date + ' 23:59:59');
+  }
+
+  if (searchParams.client_ip) {
+    query += ' AND ip_address LIKE ?';
+    queryParams.push('%' + searchParams.client_ip + '%');
+  }
+
+  if (searchParams.requested_path) {
+    query += ' AND path LIKE ?';
+    queryParams.push('%' + searchParams.requested_path + '%');
+  }
+
+  if (searchParams.user_agent) {
+    query += ' AND user_agent LIKE ?';
+    queryParams.push('%' + searchParams.user_agent + '%');
+  }
+
+  if (searchParams.is_suspicious === 'true') {
+    query += ' AND (error_code >= 400 OR path LIKE "%admin%" OR path LIKE "%.php" OR path LIKE "%.asp")';
+  }
+
+  if (searchParams.instant_search) {
+    const search = searchParams.instant_search;
+    query += ' AND (path LIKE ? OR ip_address LIKE ? OR user_agent LIKE ? OR error_code LIKE ?)';
+    queryParams.push('%' + search + '%', '%' + search + '%', '%' + search + '%', '%' + search + '%');
+  }
+
+  query += ' ORDER BY timestamp DESC';
+  return { query, queryParams };
+}
+
+let logs = [];
+let errorMessage = '';
+let totalLogs = 0;
+
+try {
+  const connection = await mysql.createConnection(dbConfig);
+  
+  // Primeiro tentar buscar da tabela logs_error com filtros
+  try {
+    const { query, queryParams } = buildFilteredQuery(searchParams);
+    
+    // Query de contagem
+    let countQuery = query.replace(/SELECT .* FROM/, 'SELECT COUNT(*) as total FROM');
+    const [countResult] = await connection.execute(countQuery, queryParams);
+    totalLogs = countResult[0].total;
+    
+    // Adicionar LIMIT e OFFSET usando template (para evitar problemas com placeholders)
+    const offset = (searchParams.page - 1) * searchParams.limit;
+    const fullQuery = `${query} LIMIT ${searchParams.limit} OFFSET ${offset}`;
+    
+    const [logsError] = await connection.execute(fullQuery, queryParams);
+    
+    logs = logsError.map(log => ({
+      ...log,
+      timestamp: log.timestamp.toISOString()
+    }));
+    
+  } catch (e) {
+    // Se logs_error não existir, tentar security_logs
+    try {
+      const [countResult] = await connection.execute(`SELECT COUNT(*) as total FROM security_logs`);
+      totalLogs = countResult[0].total;
+      
+      const offset = (searchParams.page - 1) * searchParams.limit;
+      const [securityLogs] = await connection.execute(`
+        SELECT id, event_type as error_code, ip_address as client_ip, 
+               user_agent, referrer as referer, created_at as timestamp,
+               details, severity
+        FROM security_logs 
+        ORDER BY created_at DESC 
+        LIMIT ${searchParams.limit} OFFSET ${offset}
+      `);
+      
+      logs = securityLogs.map(log => ({
+        id: log.id,
+        error_code: log.error_code,
+        requested_path: typeof log.details === 'object' ? JSON.stringify(log.details) : (log.details || 'N/A'),
+        client_ip: log.client_ip,
+        user_agent: log.user_agent,
+        referer: log.referer,
+        is_suspicious: log.severity === 'high' || log.severity === 'critical',
+        timestamp: log.timestamp.toISOString(),
+        method: 'GET',
+        response_time_ms: null
+      }));
+    } catch (e2) {
+      // Se nenhuma tabela existir, tentar security_events
+      try {
+        const [countResult] = await connection.execute(`SELECT COUNT(*) as total FROM security_events`);
+        totalLogs = countResult[0].total;
+        
+        const offset = (searchParams.page - 1) * searchParams.limit;
+        const [securityEvents] = await connection.execute(`
+          SELECT id, event_type as error_code, client_ip, user_agent, 
+                 timestamp, message as details, severity
+          FROM security_events 
+          ORDER BY timestamp DESC 
+          LIMIT ${searchParams.limit} OFFSET ${offset}
+        `);
+        
+        logs = securityEvents.map(log => ({
+          id: log.id,
+          error_code: log.error_code,
+          requested_path: typeof log.details === 'object' ? JSON.stringify(log.details) : (log.details || 'N/A'),
+          client_ip: log.client_ip,
+          user_agent: log.user_agent,
+          referer: null,
+          is_suspicious: log.severity === 'high' || log.severity === 'critical',
+          timestamp: log.timestamp.toISOString(),
+          method: 'GET',
+          response_time_ms: null
+        }));
+      } catch (e3) {
+        errorMessage = `Nenhuma tabela de logs encontrada: ${e3.message}`;
+      }
+    }
+  }
+  
+  await connection.end();
+} catch (error) {
+  errorMessage = `Erro ao conectar ao MySQL: ${error.message}`;
+  console.error('Erro MySQL:', error);
+}
+const totalPages = Math.ceil(totalLogs / searchParams.limit);
+const pagination = {
+  currentPage: searchParams.page,
+  totalPages,
+  hasNext: searchParams.page < totalPages,
+  hasPrev: searchParams.page > 1,
+  total: totalLogs
+};
+---
+
+<BaseLayout title="Logs do Sistema - Admin">
+  <div class="admin-container">
+    <AdminSidebar />
+    
+    <main class="admin-content">
+      <div class="page-header">
+        <h1>📊 Logs do Sistema</h1>
+        <p>Monitore e analise os logs de acesso e erros do sistema</p>
+        
+        {errorMessage && (
+          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            <strong>Erro:</strong> {errorMessage}
+          </div>
+        )}
+        
+        {logs.length === 0 && !errorMessage && (
+          <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4">
+            <strong>Aviso:</strong> Nenhum log encontrado no banco de dados.
+          </div>
+        )}
+        
+        {logs.length > 0 && (
+          <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+            <strong>Sucesso:</strong> {logs.length} logs carregados do MySQL!
+          </div>
+        )}
+      </div>
+
+      <!-- Filtros Rápidos -->
+      <div class="quick-filters">
+        <h3>🔍 Filtros Rápidos</h3>
+        <div class="filter-chips">
+          <button class="quick-filter" data-filter="error" data-value="404">404 - Não Encontrado</button>
+          <button class="quick-filter" data-filter="error" data-value="500">500 - Erro Interno</button>
+          <button class="quick-filter" data-filter="suspicious" data-value="1">🚨 Suspeitos</button>
+          <button class="quick-filter" data-filter="time" data-value="1h">⏰ Última Hora</button>
+          <button class="quick-filter" data-filter="time" data-value="24h">📅 Últimas 24h</button>
+          <button class="quick-filter" data-filter="time" data-value="7d">📆 Últimos 7 dias</button>
+        </div>
+      </div>
+
+      <!-- Busca Instantânea -->
+      <div class="instant-search">
+        <input 
+          type="text" 
+          id="instant_search" 
+          placeholder="🔍 Busca instantânea (IP, caminho, user agent...)" 
+          value={searchParams.instant_search}
+        />
+      </div>
+
+      <!-- Filtros Rápidos -->
+      <div class="quick-filters-container mb-4">
+        <h6 class="mb-3"><i class="fas fa-filter me-2"></i>Filtros Rápidos</h6>
+        <div class="d-flex flex-wrap gap-2">
+          <button class="btn btn-outline-secondary btn-sm quick-filter active" data-filter="" data-value="">
+            <i class="fas fa-list me-1"></i>Todos
+          </button>
+          <button class="btn btn-outline-warning btn-sm quick-filter" data-filter="error" data-value="404">
+            <i class="fas fa-exclamation-triangle me-1"></i>404 Errors
+          </button>
+          <button class="btn btn-outline-danger btn-sm quick-filter" data-filter="error" data-value="500">
+            <i class="fas fa-times-circle me-1"></i>500 Errors
+          </button>
+          <button class="btn btn-outline-info btn-sm quick-filter" data-filter="error" data-value="403">
+            <i class="fas fa-ban me-1"></i>403 Errors
+          </button>
+          <button class="btn btn-outline-dark btn-sm quick-filter" data-filter="suspicious" data-value="true">
+            <i class="fas fa-shield-alt me-1"></i>Suspeitos
+          </button>
+          <button class="btn btn-outline-success btn-sm quick-filter" data-filter="time" data-value="1h">
+            <i class="fas fa-clock me-1"></i>Última Hora
+          </button>
+          <button class="btn btn-outline-primary btn-sm quick-filter" data-filter="time" data-value="24h">
+            <i class="fas fa-calendar-day me-1"></i>Últimas 24h
+          </button>
+          <button class="btn btn-outline-purple btn-sm quick-filter" data-filter="time" data-value="7d">
+            <i class="fas fa-calendar-week me-1"></i>Últimos 7 dias
+          </button>
+        </div>
+      </div>
+
+      <!-- Filtros Avançados -->
+      <div class="advanced-filters">
+        <button type="button" id="toggle-filters" class="btn-toggle-filters">
+          🔧 Filtros Avançados
+        </button>
+        
+        <form id="advancedForm" class="filters-form" style="display: none;">
+          <div class="filter-grid">
+            <div class="filter-group">
+              <label for="error_code">Código de Erro:</label>
+              <select id="error_code" name="error_code">
+                <option value="">Todos</option>
+                <option value="400" {searchParams.error_code === '400' ? 'selected' : ''}>400 - Bad Request</option>
+                <option value="401" {searchParams.error_code === '401' ? 'selected' : ''}>401 - Unauthorized</option>
+                <option value="403" {searchParams.error_code === '403' ? 'selected' : ''}>403 - Forbidden</option>
+                <option value="404" {searchParams.error_code === '404' ? 'selected' : ''}>404 - Not Found</option>
+                <option value="500" {searchParams.error_code === '500' ? 'selected' : ''}>500 - Internal Error</option>
+                <option value="502" {searchParams.error_code === '502' ? 'selected' : ''}>502 - Bad Gateway</option>
+                <option value="503" {searchParams.error_code === '503' ? 'selected' : ''}>503 - Service Unavailable</option>
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label for="start_date">Data Início:</label>
+              <input type="datetime-local" id="start_date" name="start_date" value={searchParams.start_date} />
+            </div>
+
+            <div class="filter-group">
+              <label for="end_date">Data Fim:</label>
+              <input type="datetime-local" id="end_date" name="end_date" value={searchParams.end_date} />
+            </div>
+
+            <div class="filter-group">
+              <label for="client_ip">IP do Cliente:</label>
+              <input type="text" id="client_ip" name="client_ip" placeholder="192.168.1.1" value={searchParams.client_ip} />
+            </div>
+
+            <div class="filter-group">
+              <label for="requested_path">Caminho Solicitado:</label>
+              <input type="text" id="requested_path" name="requested_path" placeholder="/api/users" value={searchParams.requested_path} />
+            </div>
+
+            <div class="filter-group">
+              <label for="user_agent">User Agent:</label>
+              <input type="text" id="user_agent" name="user_agent" placeholder="Mozilla, curl, etc." value={searchParams.user_agent} />
+            </div>
+
+            <div class="filter-group">
+              <label for="is_suspicious">Suspeito:</label>
+              <select id="is_suspicious" name="is_suspicious">
+                <option value="">Todos</option>
+                <option value="1" {searchParams.is_suspicious === '1' ? 'selected' : ''}>Sim</option>
+                <option value="0" {searchParams.is_suspicious === '0' ? 'selected' : ''}>Não</option>
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label for="limit">Logs por página:</label>
+              <select id="limit" name="limit">
+                <option value="25" {searchParams.limit === 25 ? 'selected' : ''}>25</option>
+                <option value="50" {searchParams.limit === 50 ? 'selected' : ''}>50</option>
+                <option value="100" {searchParams.limit === 100 ? 'selected' : ''}>100</option>
+                <option value="200" {searchParams.limit === 200 ? 'selected' : ''}>200</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="filter-actions">
+            <button type="submit" class="btn-primary">🔍 Filtrar</button>
+            <button type="button" id="clear-filters" class="btn-secondary">🗑️ Limpar</button>
+            <button type="button" id="save-filters" class="btn-info">💾 Salvar Filtros</button>
+            <button type="button" id="load-filters" class="btn-info">📂 Carregar Filtros</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Ações em Massa -->
+      <div class="bulk-actions" style="display: none;">
+        <div class="bulk-info">
+          <span id="selected-count">0</span> log(s) selecionado(s)
+        </div>
+        <div class="bulk-buttons">
+          <button id="bulk-delete-btn" class="btn-danger" disabled>🗑️ Excluir Selecionados</button>
+          <button id="bulk-export-btn" class="btn-info" disabled>📤 Exportar Selecionados</button>
+        </div>
+      </div>
+
+      <!-- Controles da Tabela -->
+      <div class="table-controls">
+        <div class="left-controls">
+          <button id="multi-select-btn" class="btn-secondary">☑️ Seleção Múltipla</button>
+          <div class="export-buttons">
+            <button onclick="exportLogs('csv')" class="btn-export">📊 Exportar CSV</button>
+            <button onclick="exportLogs('json')" class="btn-export">📋 Exportar JSON</button>
+          </div>
+        </div>
+        
+        <div class="right-controls">
+          <div class="cleanup-buttons">
+            <button class="cleanup-btn btn-warning" onclick="cleanupLogs('old')" title="Remove logs com mais de 30 dias">🗑️ Limpar Antigos (30+ dias)</button>
+            <button class="cleanup-btn btn-warning" onclick="cleanupLogs('errors')" title="Remove apenas logs de erro">❌ Limpar Erros</button>
+            <button class="cleanup-btn btn-info" onclick="cleanupLogs('security_events')" title="Limpa tabela security_events (7777 registros)">🧹 Limpar Eventos de Segurança</button>
+            <button class="cleanup-btn btn-danger" onclick="cleanupLogs('all')" title="Remove TODOS os logs - Use com cuidado!">💥 Limpar Todos</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabela de Logs -->
+      <div class="logs-container">
+        <table class="logs-table">
+          <thead>
+            <tr>
+              <th class="checkbox-cell" style="display: none;">
+                <input type="checkbox" id="select-all-logs" onchange="toggleSelectAll()" />
+              </th>
+              <th>⏰ Timestamp</th>
+              <th>🔢 Código</th>
+              <th>🌐 Caminho</th>
+              <th>📍 IP</th>
+              <th>🖥️ User Agent</th>
+              <th>🔗 Referer</th>
+              <th>🚨 Status</th>
+              <th>⚡ Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {logs.map(log => (
+              <tr class={`log-row ${log.is_suspicious ? 'suspicious' : ''}`}>
+                <td class="checkbox-cell" style="display: none;">
+                  <input type="checkbox" class="log-checkbox" value={log.id} onchange="toggleLogSelection(this)" />
+                </td>
+                <td>
+                  <span class="timestamp">{new Date(log.timestamp).toLocaleString('pt-BR')}</span>
+                </td>
+                <td>
+                  <span class={`error-code error-${log.error_code}`}>{log.error_code}</span>
+                </td>
+                <td>
+                  <span class="path" title={log.requested_path}>{log.requested_path}</span>
+                </td>
+                <td>
+                  <span class="ip-address" title={log.client_ip}>{log.client_ip || 'Unknown'}</span>
+                </td>
+                <td>
+                  <span class="user-agent" title={log.user_agent}>
+                    {log.user_agent ? log.user_agent.substring(0, 50) + '...' : 'N/A'}
+                  </span>
+                </td>
+                <td>
+                  <span class="referer-tooltip" title={log.referer || 'Direct'} data-referer={log.referer || 'N/A'}>
+                    {log.referer ? log.referer.substring(0, 40) + '...' : 'Direct'}
+                  </span>
+                </td>
+                <td>
+                  <span class={`suspicious-badge ${log.is_suspicious ? 'suspicious' : 'normal'}`}>
+                    {log.is_suspicious ? '🚨 Suspeito' : '✅ Normal'}
+                  </span>
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <button class="btn-block-ip" data-ip={log.client_ip} title="Bloquear/Desbloquear IP">
+                      🚫 Bloquear
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Paginação -->
+      <div class="pagination">
+        {pagination.hasPrev && (
+          <a href={`?page=${pagination.currentPage - 1}&${new URLSearchParams(searchParams).toString()}`} class="btn-page">
+            ← Anterior
+          </a>
+        )}
+        
+        {pagination.currentPage > 2 && (
+          <a href={`?page=1&${new URLSearchParams(searchParams).toString()}`} class="btn-page">1</a>
+        )}
+        {pagination.currentPage > 3 && <span class="pagination-dots">...</span>}
+        
+        {pagination.currentPage > 1 && (
+          <a href={`?page=${pagination.currentPage - 1}&${new URLSearchParams(searchParams).toString()}`} class="btn-page">
+            {pagination.currentPage - 1}
+          </a>
+        )}
+        
+        <a href={`?page=${pagination.currentPage}&${new URLSearchParams(searchParams).toString()}`} class="btn-page active">
+          {pagination.currentPage}
+        </a>
+        
+        {pagination.currentPage < pagination.totalPages && (
+          <a href={`?page=${pagination.currentPage + 1}&${new URLSearchParams(searchParams).toString()}`} class="btn-page">
+            {pagination.currentPage + 1}
+          </a>
+        )}
+        
+        {pagination.currentPage < pagination.totalPages - 2 && <span class="pagination-dots">...</span>}
+        {pagination.currentPage < pagination.totalPages - 1 && (
+          <a href={`?page=${pagination.totalPages}&${new URLSearchParams(searchParams).toString()}`} class="btn-page">
+            {pagination.totalPages}
+          </a>
+        )}
+        
+        {pagination.hasNext && (
+          <a href={`?page=${pagination.currentPage + 1}&${new URLSearchParams(searchParams).toString()}`} class="btn-page">
+            Próxima →
+          </a>
+        )}
+      </div>
+
+      <!-- Estatísticas -->
+      <div class="stats-summary">
+        <div class="stat-card">
+          <h4>📊 Total de Logs</h4>
+          <span class="stat-number">{totalLogs}</span>
+        </div>
+        <div class="stat-card">
+          <h4>🚨 Suspeitos</h4>
+          <span class="stat-number">{logs.filter(log => log.is_suspicious).length}</span>
+        </div>
+        <div class="stat-card">
+          <h4>📄 Página Atual</h4>
+          <span class="stat-number">{pagination.currentPage} de {pagination.totalPages}</span>
+        </div>
+        <div class="stat-card">
+          <h4>🔒 Eventos de Segurança</h4>
+          <span class="stat-number" id="security-events-count">Carregando...</span>
+          <p id="security-events-error" style="display: none; color: red; font-size: 12px;"></p>
+          <button onclick="loadSecurityEvents()" class="btn-secondary" style="margin-top: 5px; font-size: 12px;">Ver Eventos</button>
+        </div>
+      </div>
+
+      <!-- Seção de Eventos de Segurança -->
+      <div class="security-events-section" style="margin-top: 2rem;">
+        <div class="section-header">
+          <h3>🔒 Eventos de Segurança Recentes</h3>
+          <button onclick="loadSecurityEventsTable()" class="btn-info">🔄 Atualizar</button>
+        </div>
+        <div id="security-events-container" class="security-events-container">
+          <div class="loading-message">Carregando eventos de segurança...</div>
+        </div>
+      </div>
+    </main>
+  </div>
+</BaseLayout>
+
+<style>
+  .admin-container {
+    display: flex;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  .admin-content {
+    flex: 1;
+    padding: 2rem;
+    margin-left: 250px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px 0 0 20px;
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
+  }
+
+  .page-header {
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  .page-header h1 {
+    color: #2d3748;
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .page-header p {
+    color: #718096;
+    font-size: 1.1rem;
+  }
+
+  /* Seção de Eventos de Segurança */
+  .security-events-section {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .section-header h3 {
+    color: #2d3748;
+    margin: 0;
+  }
+
+  .security-events-container {
+    min-height: 200px;
+  }
+
+  .security-events-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+  }
+
+  .security-events-table th,
+  .security-events-table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .security-events-table th {
+    background-color: #f7fafc;
+    font-weight: 600;
+    color: #2d3748;
+  }
+
+  .security-events-table tr:hover {
+    background-color: #f7fafc;
+  }
+
+  .severity-high {
+    color: #e53e3e;
+    font-weight: bold;
+  }
+
+  .severity-medium {
+    color: #dd6b20;
+    font-weight: bold;
+  }
+
+  .severity-low {
+    color: #38a169;
+  }
+
+  .loading-message {
+    text-align: center;
+    padding: 2rem;
+    color: #718096;
+  }
+
+  /* Filtros Rápidos */
+  .quick-filters {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+  }
+
+  .quick-filters h3 {
+    margin-bottom: 1rem;
+    color: #2d3748;
+  }
+
+  .filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .quick-filter {
+    padding: 0.5rem 1rem;
+    border: 2px solid #e2e8f0;
+    background: white;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+  }
+
+  .quick-filter:hover {
+    border-color: #667eea;
+    background: #f7fafc;
+    transform: translateY(-2px);
+  }
+
+  .quick-filter.active {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+  }
+
+  /* Busca Instantânea */
+  .instant-search {
+    margin-bottom: 1.5rem;
+  }
+
+  .instant-search input {
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 15px;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+  }
+
+  .instant-search input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+
+  /* Filtros Avançados */
+  .advanced-filters {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+  }
+
+  .btn-toggle-filters {
+    width: 100%;
+    padding: 1rem;
+    background: #f7fafc;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2d3748;
+    transition: all 0.3s ease;
+  }
+
+  .btn-toggle-filters:hover {
+    background: #edf2f7;
+  }
+
+  .filters-form {
+    padding: 1.5rem;
+  }
+
+  .filter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .filter-group label {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #2d3748;
+  }
+
+  .filter-group input,
+  .filter-group select {
+    padding: 0.75rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+  }
+
+  .filter-group input:focus,
+  .filter-group select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+
+  .filter-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  /* Ações em Massa */
+  .bulk-actions {
+    background: #fff5f5;
+    border: 2px solid #fed7d7;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .bulk-info {
+    font-weight: 600;
+    color: #c53030;
+  }
+
+  .bulk-buttons {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  /* Controles da Tabela */
+  .table-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .left-controls,
+  .right-controls {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .export-buttons,
+  .cleanup-buttons {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  /* Tabela de Logs */
+  .logs-container {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+
+  .logs-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .logs-table th {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .logs-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: top;
+  }
+
+  .log-row:hover {
+    background: #f7fafc;
+  }
+
+  .log-row.suspicious {
+    background: #fff5f5;
+    border-left: 4px solid #f56565;
+  }
+
+  .log-row.suspicious:hover {
+    background: #fed7d7;
+  }
+
+  /* Estilos dos elementos da tabela */
+  .timestamp {
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    color: #4a5568;
+  }
+
+  .error-code {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.8rem;
+  }
+
+  .error-400, .error-401, .error-403, .error-404 {
+    background: #fed7d7;
+    color: #c53030;
+  }
+
+  .error-500, .error-502, .error-503 {
+    background: #fbb6ce;
+    color: #97266d;
+  }
+
+  .path {
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    color: #2d3748;
+    max-width: 200px;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ip-address {
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    color: #4a5568;
+  }
+
+  .user-agent {
+    font-size: 0.8rem;
+    color: #718096;
+    max-width: 150px;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .referer {
+    font-size: 0.8rem;
+    color: #718096;
+    max-width: 120px;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .suspicious-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.8rem;
+  }
+
+  .suspicious-badge.suspicious {
+    background: #fed7d7;
+    color: #c53030;
+  }
+
+  .suspicious-badge.normal {
+    background: #c6f6d5;
+    color: #22543d;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .btn-block-ip {
+    padding: 0.25rem 0.5rem;
+    background: #fed7d7;
+    color: #c53030;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+  }
+
+  .btn-block-ip:hover {
+    background: #feb2b2;
+  }
+
+  /* Paginação */
+  .pagination {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .btn-page {
+    padding: 0.75rem 1rem;
+    background: white;
+    color: #4a5568;
+    text-decoration: none;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+  }
+
+  .btn-page:hover {
+    background: #f7fafc;
+    border-color: #cbd5e0;
+  }
+
+  .btn-page.active {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+  }
+
+  /* Estatísticas */
+  .stats-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+
+  .stat-card h4 {
+    margin-bottom: 0.5rem;
+    color: #4a5568;
+    font-size: 0.9rem;
+  }
+
+  .stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2d3748;
+  }
+
+  /* Botões */
+  .btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  }
+
+  .btn-secondary {
+    background: #edf2f7;
+    color: #4a5568;
+    border: 2px solid #e2e8f0;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .btn-secondary:hover {
+    background: #e2e8f0;
+    transform: translateY(-2px);
+  }
+
+  .btn-secondary.active {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+  }
+
+  .btn-info {
+    background: #bee3f8;
+    color: #2c5282;
+    border: 2px solid #90cdf4;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .btn-info:hover {
+    background: #90cdf4;
+    transform: translateY(-2px);
+  }
+
+  .btn-warning {
+    background: #faf089;
+    color: #744210;
+    border: 2px solid #f6e05e;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .btn-warning:hover {
+    background: #f6e05e;
+    transform: translateY(-2px);
+  }
+
+  .btn-danger {
+    background: #fed7d7;
+    color: #c53030;
+    border: 2px solid #feb2b2;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .btn-danger:hover {
+    background: #feb2b2;
+    transform: translateY(-2px);
+  }
+
+  .btn-export {
+    background: #c6f6d5;
+    color: #22543d;
+    border: 2px solid #9ae6b4;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .btn-export:hover {
+    background: #9ae6b4;
+    transform: translateY(-2px);
+  }
+
+  /* Filtros Rápidos */
+  .quick-filters-container {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #dee2e6;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+
+  .quick-filter {
+    transition: all 0.3s ease;
+    border-radius: 20px;
+    font-weight: 500;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .quick-filter:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+
+  .quick-filter.active {
+    background: linear-gradient(135deg, #007bff, #0056b3) !important;
+    color: white !important;
+    border-color: #007bff !important;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+  }
+
+  .btn-outline-purple {
+    color: #6f42c1;
+    border-color: #6f42c1;
+  }
+
+  .btn-outline-purple:hover {
+    background-color: #6f42c1;
+    border-color: #6f42c1;
+    color: white;
+  }
+
+  /* Busca em tempo real */
+  .search-container .form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  }
+
+  /* Destaque de busca */
+  mark {
+    background: linear-gradient(135deg, #fff3cd, #ffeaa7) !important;
+    padding: 2px 4px !important;
+    border-radius: 3px !important;
+    font-weight: 600 !important;
+    animation: highlight-pulse 2s ease-in-out;
+  }
+
+  @keyframes highlight-pulse {
+    0% { background-color: #fff3cd; }
+    50% { background-color: #ffeaa7; }
+    100% { background-color: #fff3cd; }
+  }
+
+  /* Indicador de filtro ativo */
+  #filter-indicator {
+    animation: slideDown 0.3s ease-out;
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Responsividade */
+  @media (max-width: 768px) {
+    .admin-content {
+      margin-left: 0;
+      border-radius: 0;
+    }
+
+    .filter-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .table-controls {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .left-controls,
+    .right-controls {
+      justify-content: center;
+    }
+
+    .logs-table {
+      font-size: 0.8rem;
+    }
+
+    .logs-table th,
+    .logs-table td {
+      padding: 0.5rem;
+    }
+  }
+  /* Estilos para modal de eventos de segurança */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .modal-content {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    max-width: 95%;
+    max-height: 90%;
+    overflow: hidden;
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+    background: #f8f9fa;
+  }
+
+  .modal-header h3 {
+    margin: 0;
+    color: #333;
+  }
+
+  .btn-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .btn-close:hover {
+    color: #000;
+    background: #f0f0f0;
+    border-radius: 50%;
+  }
+
+  .modal-body {
+    padding: 20px;
+  }
+
+  .pagination-info {
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+  }
+
+  .cleanup-actions {
+    text-align: center;
+  }
+
+  .btn-danger {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .btn-danger:hover {
+    background: #c82333;
+  }
+
+  /* Tooltip para Referer */
+  .referer-tooltip {
+    position: relative;
+    cursor: pointer;
+    color: #007bff;
+    text-decoration: underline;
+    max-width: 200px;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .referer-tooltip:hover::after {
+    content: attr(data-referer);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    z-index: 1000;
+    max-width: 400px;
+    word-break: break-all;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    margin-bottom: 5px;
+  }
+
+  .referer-tooltip:hover::before {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(1px);
+    border: 5px solid transparent;
+    border-top-color: #333;
+    z-index: 1001;
+  }
+</style>
+
+<script>
+// Variáveis globais
+let searchTimeout;
+let currentFilters = {};
+let selectedLogs = new Set();
+let multiSelectMode = false;
+let allRows = [];
+let filteredRows = [];
+
+// Funcionalidades principais
+document.addEventListener('DOMContentLoaded', function() {
+  initializeFilters();
+  initializeCleanupButtons();
+  initializeExportButtons();
+  initializeMultiSelect();
+  initializeInstantSearch();
+  initializeQuickFilters();
+  initializeRealTimeSearch();
+  cacheTableRows();
+});
+
+// Cache das linhas da tabela para busca rápida
+function cacheTableRows() {
+  const tbody = document.querySelector('.logs-table tbody');
+  if (tbody) {
+    allRows = Array.from(tbody.querySelectorAll('tr'));
+    filteredRows = [...allRows];
+  }
+}
+
+// Inicializar filtros rápidos
+function initializeQuickFilters() {
+  const quickFilters = document.querySelectorAll('.quick-filter');
+  quickFilters.forEach(btn => {
+    btn.addEventListener('click', function() {
+      // Remover classe active de todos os botões
+      quickFilters.forEach(b => b.classList.remove('active'));
+      // Adicionar classe active ao botão clicado
+      this.classList.add('active');
+      
+      const filter = this.dataset.filter;
+      const value = this.dataset.value;
+      applyQuickFilterToTable(filter, value);
+    });
+  });
+}
+
+// Aplicar filtro rápido na tabela
+function applyQuickFilterToTable(filter, value) {
+  if (!filter || !value) {
+    showAllRows();
+    return;
+  }
+
+  allRows.forEach(row => {
+    let shouldShow = false;
+    
+    if (filter === 'error') {
+      const errorCode = row.cells[2]?.textContent?.trim() || '';
+      shouldShow = errorCode === value;
+    } else if (filter === 'suspicious') {
+      const suspiciousBadge = row.querySelector('.suspicious-badge');
+      shouldShow = suspiciousBadge && suspiciousBadge.classList.contains('suspicious');
+    } else if (filter === 'time') {
+      const timestamp = row.cells[1]?.textContent?.trim() || '';
+      const logDate = new Date(timestamp.replace(/\//g, '-'));
+      const now = new Date();
+      
+      if (value === '1h') {
+        shouldShow = (now - logDate) <= (60 * 60 * 1000);
+      } else if (value === '24h') {
+        shouldShow = (now - logDate) <= (24 * 60 * 60 * 1000);
+      } else if (value === '7d') {
+        shouldShow = (now - logDate) <= (7 * 24 * 60 * 60 * 1000);
+      }
+    }
+    
+    row.style.display = shouldShow ? '' : 'none';
+  });
+
+  updateResultsCount();
+}
+
+// Inicializar busca em tempo real
+function initializeRealTimeSearch() {
+  const searchInput = document.getElementById('instant_search');
+  if (searchInput) {
+    searchInput.addEventListener('input', debounce(function(e) {
+      performRealTimeSearch(e.target.value);
+    }, 300));
+  }
+}
+
+// Debounce para otimizar performance
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
+// Executar busca em tempo real
+function performRealTimeSearch(searchTerm) {
+  const term = searchTerm.toLowerCase().trim();
+  
+  if (!term) {
+    showAllRows();
+    return;
+  }
+
+  allRows.forEach(row => {
+    const text = row.textContent.toLowerCase();
+    const shouldShow = text.includes(term);
+    row.style.display = shouldShow ? '' : 'none';
+    
+    // Destacar termo encontrado
+    if (shouldShow) {
+      highlightSearchTerm(row, term);
+    } else {
+      removeHighlight(row);
+    }
+  });
+
+  updateResultsCount();
+}
+
+// Destacar termo de busca
+function highlightSearchTerm(row, term) {
+  const cells = row.querySelectorAll('td');
+  cells.forEach(cell => {
+    const spans = cell.querySelectorAll('span');
+    const textElements = spans.length > 0 ? spans : [cell];
+    
+    textElements.forEach(element => {
+      const originalText = element.textContent;
+      if (originalText.toLowerCase().includes(term)) {
+        const regex = new RegExp(`(${escapeRegExp(term)})`, 'gi');
+        element.innerHTML = originalText.replace(regex, '<mark style="background: yellow; padding: 1px 2px; border-radius: 2px;">$1</mark>');
+      }
+    });
+  });
+}
+
+// Remover destaque
+function removeHighlight(row) {
+  const marks = row.querySelectorAll('mark');
+  marks.forEach(mark => {
+    const parent = mark.parentNode;
+    parent.replaceChild(document.createTextNode(mark.textContent), mark);
+    parent.normalize();
+  });
+}
+
+// Escape regex characters
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// Mostrar todas as linhas
+function showAllRows() {
+  allRows.forEach(row => {
+    row.style.display = '';
+    removeHighlight(row);
+  });
+  updateResultsCount();
+}
+
+// Atualizar contador de resultados
+function updateResultsCount() {
+  const visibleRows = allRows.filter(row => row.style.display !== 'none');
+  const totalRows = allRows.length;
+  
+  // Atualizar estatísticas
+  const totalLogsElement = document.querySelector('.stat-card .stat-number');
+  if (totalLogsElement) {
+    totalLogsElement.textContent = visibleRows.length;
+  }
+  
+  // Mostrar indicador de filtro ativo
+  const pageHeader = document.querySelector('.page-header');
+  let filterIndicator = document.getElementById('filter-indicator');
+  
+  if (visibleRows.length < totalRows) {
+    if (!filterIndicator) {
+      filterIndicator = document.createElement('div');
+      filterIndicator.id = 'filter-indicator';
+      filterIndicator.className = 'bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded mb-4';
+      pageHeader.appendChild(filterIndicator);
+    }
+    filterIndicator.innerHTML = `<strong>Filtro Ativo:</strong> Mostrando ${visibleRows.length} de ${totalRows} logs`;
+  } else if (filterIndicator) {
+    filterIndicator.remove();
+  }
+}
+
+// Inicializar filtros avançados
+function initializeFilters() {
+  const toggleBtn = document.getElementById('toggle-filters');
+  const advancedForm = document.getElementById('advancedForm');
+  
+  if (toggleBtn && advancedForm) {
+    toggleBtn.addEventListener('click', function() {
+      const isVisible = advancedForm.style.display !== 'none';
+      advancedForm.style.display = isVisible ? 'none' : 'block';
+      toggleBtn.textContent = isVisible ? '🔧 Filtros Avançados' : '🔧 Ocultar Filtros';
+    });
+  }
+
+  // Aplicar filtros quando o formulário for submetido
+  const advancedFormElement = document.getElementById('advancedForm');
+  if (advancedFormElement) {
+    advancedFormElement.addEventListener('submit', function(e) {
+      e.preventDefault();
+      applyFilters();
+    });
+  }
+  
+  // Botão limpar filtros
+  const clearFiltersBtn = document.getElementById('clear-filters');
+  if (clearFiltersBtn) {
+    clearFiltersBtn.addEventListener('click', function() {
+      // Limpar todos os campos do formulário
+      const form = document.getElementById('advancedForm');
+      form.reset();
+      
+      // Redirecionar para a página sem parâmetros de filtro
+      const params = new URLSearchParams(window.location.search);
+      params.delete('error_code');
+      params.delete('start_date');
+      params.delete('end_date');
+      params.delete('client_ip');
+      params.delete('requested_path');
+      params.delete('user_agent');
+      params.delete('is_suspicious');
+      params.set('page', '1');
+      
+      window.location.href = '?' + params.toString();
+    });
+  }
+
+  // Filtros rápidos
+  const quickFilters = document.querySelectorAll('.quick-filter');
+  quickFilters.forEach(btn => {
+    btn.addEventListener('click', function() {
+      // Remover classe active de todos os botões
+      quickFilters.forEach(b => b.classList.remove('active'));
+      // Adicionar classe active ao botão clicado
+      this.classList.add('active');
+      
+      const filter = this.dataset.filter;
+      const value = this.dataset.value;
+      applyQuickFilter(filter, value);
+    });
+  });
+}
+
+// Aplicar filtros
+function applyFilters() {
+  const formData = new FormData(document.getElementById('advancedForm'));
+  const params = new URLSearchParams(window.location.search);
+  
+  // Remover parâmetros de filtro existentes
+  params.delete('error_code');
+  params.delete('start_date');
+  params.delete('end_date');
+  params.delete('client_ip');
+  params.delete('requested_path');
+  params.delete('user_agent');
+  params.delete('is_suspicious');
+  
+  // Adicionar novos parâmetros de filtro
+  for (let [key, value] of formData.entries()) {
+    if (value && value.trim() !== '') {
+      params.set(key, value);
+    }
+  }
+  
+  // Resetar para página 1 quando aplicar filtros
+  params.set('page', '1');
+  
+  window.location.href = '?' + params.toString();
+}
+
+// Aplicar filtro rápido
+function applyQuickFilter(filter, value) {
+  const table = document.querySelector('.logs-table tbody');
+  const rows = table.querySelectorAll('tr');
+  
+  // Se não há filtro, mostrar todas as linhas
+  if (!filter || !value) {
+    rows.forEach(row => row.style.display = '');
+    updateVisibleLogsCount();
+    return;
+  }
+  
+  rows.forEach(row => {
+    let shouldShow = false;
+    
+    if (filter === 'error') {
+      const statusCell = row.cells[2]; // Coluna Status
+      if (statusCell && statusCell.textContent.includes(value)) {
+        shouldShow = true;
+      }
+    } else if (filter === 'suspicious') {
+      const suspiciousCell = row.cells[6]; // Coluna Suspeito
+      if (suspiciousCell && suspiciousCell.textContent.includes('🚨')) {
+        shouldShow = true;
+      }
+    } else if (filter === 'time') {
+      const timestampCell = row.cells[0]; // Coluna Timestamp
+      if (timestampCell) {
+        const rowDate = new Date(timestampCell.textContent);
+        const now = new Date();
+        let cutoffDate;
+        
+        if (value === '1h') {
+          cutoffDate = new Date(now.getTime() - 60 * 60 * 1000);
+        } else if (value === '24h') {
+          cutoffDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        } else if (value === '7d') {
+          cutoffDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        }
+        
+        if (cutoffDate && rowDate >= cutoffDate) {
+          shouldShow = true;
+        }
+      }
+    }
+    
+    row.style.display = shouldShow ? '' : 'none';
+  });
+  
+  // Atualizar contador de logs visíveis
+  updateVisibleLogsCount();
+}
+
+// Função para atualizar contador de logs visíveis
+function updateVisibleLogsCount() {
+  const table = document.querySelector('.logs-table tbody');
+  const visibleRows = table.querySelectorAll('tr:not([style*="display: none"])');
+  const totalRows = table.querySelectorAll('tr');
+  
+  // Procurar por elemento de contador e atualizar
+  const counterElement = document.querySelector('.logs-count');
+  if (counterElement) {
+    counterElement.textContent = `Mostrando ${visibleRows.length} de ${totalRows.length} logs`;
+  }
+}
+
+// Inicializar botões de limpeza
+function initializeCleanupButtons() {
+  const cleanupBtns = document.querySelectorAll('.cleanup-btn');
+  
+  cleanupBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      const action = this.dataset.action;
+      
+      if (confirm(`Tem certeza que deseja ${getCleanupMessage(action)}?`)) {
+        performCleanup(action);
+      }
+    });
+  });
+}
+
+// Mensagens de confirmação para limpeza
+function getCleanupMessage(action) {
+  switch(action) {
+    case 'old': return 'limpar logs antigos (30+ dias)';
+    case 'errors': return 'limpar todos os logs de erro';
+    case 'all': return 'limpar TODOS os logs (ação irreversível)';
+    default: return 'executar esta ação';
+  }
+}
+
+// Executar limpeza
+async function performCleanup(action) {
+  try {
+    const response = await fetch('/api/logs/cleanup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ action })
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      alert(`Limpeza concluída! ${result.deletedCount} logs removidos.`);
+      window.location.reload();
+    } else {
+      alert('Erro na limpeza: ' + result.message);
+    }
+  } catch (error) {
+    console.error('Erro:', error);
+    alert('Erro ao executar limpeza. Verifique o console.');
+  }
+}
+
+// Função para limpar logs (escopo global)
+window.cleanupLogs = async function(action) {
+  let confirmMessage = '';
+  
+  switch(action) {
+    case 'old':
+      confirmMessage = 'Tem certeza que deseja remover logs com mais de 30 dias?';
+      break;
+    case 'errors':
+      confirmMessage = 'Tem certeza que deseja remover apenas logs de erro (4xx/5xx)?';
+      break;
+    case 'security_events':
+      confirmMessage = 'Tem certeza que deseja limpar TODOS os 7777+ eventos de segurança? Esta ação não pode ser desfeita!';
+      break;
+    case 'all':
+      confirmMessage = 'ATENÇÃO: Tem certeza que deseja remover TODOS os logs? Esta ação não pode ser desfeita!';
+      break;
+    default:
+      confirmMessage = 'Tem certeza que deseja limpar os logs?';
+  }
+  
+  if (confirm(confirmMessage)) {
+    try {
+      // Mostrar loading
+      const button = event.target;
+      const originalText = button.textContent;
+      button.textContent = 'Limpando...';
+      button.disabled = true;
+      
+      const response = await fetch('/api/logs/cleanup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ action })
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        alert(`✅ ${result.message}`);
+        // Recarregar a página para atualizar os dados
+        window.location.reload();
+      } else {
+        alert(`❌ Erro: ${result.message}`);
+      }
+      
+    } catch (error) {
+      console.error('Erro na limpeza:', error);
+      alert('❌ Erro ao limpar logs. Verifique o console.');
+    } finally {
+      // Restaurar botão
+      button.textContent = originalText;
+      button.disabled = false;
+    }
+  }
+}
+
+// Função para carregar eventos de segurança
+async function loadSecurityEvents() {
+  try {
+    const response = await fetch('/api/security/events?page=1&limit=10');
+    const data = await response.json();
+    
+    if (data.success) {
+      // Atualizar contador
+      document.getElementById('security-events-count').textContent = data.pagination.total;
+      
+      // Mostrar modal com eventos
+      showSecurityEventsModal(data.events, data.pagination);
+    } else {
+      alert('❌ Erro ao carregar eventos de segurança');
+    }
+  } catch (error) {
+    console.error('Erro:', error);
+    alert('❌ Erro ao carregar eventos');
+  }
+}
+
+// Função para carregar tabela de eventos de segurança
+window.loadSecurityEventsTable = async function() {
+  const container = document.getElementById('security-events-container');
+  container.innerHTML = '<div class="loading-message">Carregando eventos de segurança...</div>';
+  
+  try {
+    const response = await fetch('/api/security/events?page=1&limit=20');
+    const data = await response.json();
+    
+    if (data.success && data.events) {
+      let tableHTML = `
+        <table class="security-events-table">
+          <thead>
+            <tr>
+              <th>⏰ Timestamp</th>
+              <th>🚨 Severidade</th>
+              <th>📝 Evento</th>
+              <th>📍 IP</th>
+              <th>🔍 Detalhes</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      
+      data.events.forEach(event => {
+        const severityClass = event.severity === 'high' ? 'severity-high' : 
+                             event.severity === 'medium' ? 'severity-medium' : 'severity-low';
+        
+        tableHTML += `
+          <tr>
+            <td>${new Date(event.timestamp).toLocaleString('pt-BR')}</td>
+            <td><span class="${severityClass}">${event.severity.toUpperCase()}</span></td>
+            <td>${event.event_type || 'N/A'}</td>
+            <td>${event.client_ip || 'N/A'}</td>
+            <td>${event.details ? event.details.substring(0, 100) + '...' : 'N/A'}</td>
+          </tr>
+        `;
+      });
+      
+      tableHTML += `
+          </tbody>
+        </table>
+        <div style="margin-top: 1rem; text-align: center; color: #718096;">
+          Mostrando ${data.events.length} de ${data.pagination?.total || 0} eventos
+        </div>
+      `;
+      
+      container.innerHTML = tableHTML;
+    } else {
+      container.innerHTML = '<div class="loading-message">Nenhum evento de segurança encontrado.</div>';
+    }
+  } catch (error) {
+    console.error('Erro ao carregar eventos de segurança:', error);
+    container.innerHTML = '<div class="loading-message" style="color: #e53e3e;">Erro ao carregar eventos de segurança.</div>';
+  }
+}
+
+// Função para mostrar modal com eventos de segurança
+function showSecurityEventsModal(events, pagination) {
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="modal-content" style="max-width: 90%; max-height: 80%; overflow-y: auto;">
+      <div class="modal-header">
+        <h3>🔒 Eventos de Segurança (${pagination.total} registros)</h3>
+        <button onclick="this.closest('.modal-overlay').remove()" class="btn-close">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="table-container">
+          <table class="logs-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Timestamp</th>
+                <th>Tipo</th>
+                <th>Descrição</th>
+                <th>IP</th>
+                <th>User Agent</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${events.map(event => `
+                <tr>
+                  <td>${event.id || 'N/A'}</td>
+                  <td>${event.timestamp ? new Date(event.timestamp).toLocaleString('pt-BR') : 'N/A'}</td>
+                  <td>${event.event_type || 'N/A'}</td>
+                  <td>${event.description || 'N/A'}</td>
+                  <td>${event.ip_address || 'N/A'}</td>
+                  <td title="${event.user_agent || 'N/A'}">${(event.user_agent || 'N/A').substring(0, 50)}...</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination-info" style="margin-top: 15px;">
+          <p>Mostrando ${events.length} de ${pagination.total} registros (Página ${pagination.page} de ${pagination.totalPages})</p>
+          <div class="cleanup-actions" style="margin-top: 15px;">
+            <button onclick="cleanupLogs('security_events')" class="btn-danger">
+              🗑️ Limpar TODOS os Eventos de Segurança
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+}
+
+// Carregar contagem de eventos ao carregar a página
+document.addEventListener('DOMContentLoaded', async function() {
+  try {
+    const response = await fetch('/api/security/events?page=1&limit=1');
+    const data = await response.json();
+    if (data.success) {
+      document.getElementById('security-events-count').textContent = data.pagination.total;
+    }
+  } catch (error) {
+    console.error('Erro ao carregar contagem:', error);
+    document.getElementById('security-events-count').textContent = 'Erro';
+  }
+});
+
+// Inicializar exportação
+function initializeExportButtons() {
+  // Botões já têm onclick definido no HTML
+}
+
+// Exportar logs
+function exportLogs(format) {
+  const logs = Array.from(document.querySelectorAll('.log-row')).map(row => {
+    const cells = row.querySelectorAll('td');
+    return {
+      timestamp: cells[1]?.textContent?.trim(),
+      error_code: cells[2]?.textContent?.trim(),
+      path: cells[3]?.textContent?.trim(),
+      ip: cells[4]?.textContent?.trim(),
+      user_agent: cells[5]?.textContent?.trim(),
+      referer: cells[6]?.textContent?.trim(),
+      suspicious: cells[7]?.textContent?.trim()
+    };
+  });
+
+  if (format === 'csv') {
+    exportToCSV(logs);
+  } else if (format === 'json') {
+    exportToJSON(logs);
+  }
+}
+
+// Exportar para CSV
+function exportToCSV(logs) {
+  const headers = ['Timestamp', 'Código', 'Caminho', 'IP', 'User Agent', 'Referer', 'Status'];
+  const csvContent = [headers.join(',')];
+  
+  logs.forEach(log => {
+    const row = [
+      `"${log.timestamp}"`,
+      `"${log.error_code}"`,
+      `"${log.path}"`,
+      `"${log.ip}"`,
+      `"${log.user_agent}"`,
+      `"${log.referer}"`,
+      `"${log.suspicious}"`
+    ];
+    csvContent.push(row.join(','));
+  });
+  
+  downloadFile(csvContent.join('\n'), 'logs.csv', 'text/csv');
+}
+
+// Exportar para JSON
+function exportToJSON(logs) {
+  const jsonContent = JSON.stringify(logs, null, 2);
+  downloadFile(jsonContent, 'logs.json', 'application/json');
+}
+
+// Download de arquivo
+function downloadFile(content, filename, contentType) {
+  const blob = new Blob([content], { type: contentType });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  window.URL.revokeObjectURL(url);
+}
+
+// Inicializar seleção múltipla
+function initializeMultiSelect() {
+  const multiSelectBtn = document.getElementById('multi-select-btn');
+  const bulkActions = document.querySelector('.bulk-actions');
+  
+  if (multiSelectBtn) {
+    multiSelectBtn.addEventListener('click', function() {
+      multiSelectMode = !multiSelectMode;
+      toggleMultiSelectMode();
+    });
+  }
+}
+
+// Toggle modo seleção múltipla
+function toggleMultiSelectMode() {
+  const checkboxCells = document.querySelectorAll('.checkbox-cell');
+  const bulkActions = document.querySelector('.bulk-actions');
+  const multiSelectBtn = document.getElementById('multi-select-btn');
+  
+  checkboxCells.forEach(cell => {
+    cell.style.display = multiSelectMode ? 'table-cell' : 'none';
+  });
+  
+  if (bulkActions) {
+    bulkActions.style.display = multiSelectMode ? 'flex' : 'none';
+  }
+  
+  if (multiSelectBtn) {
+    multiSelectBtn.textContent = multiSelectMode ? '❌ Cancelar Seleção' : '☑️ Seleção Múltipla';
+    multiSelectBtn.classList.toggle('active', multiSelectMode);
+  }
+}
+
+// Toggle seleção de log individual
+function toggleLogSelection(checkbox) {
+  const logId = checkbox.value;
+  
+  if (checkbox.checked) {
+    selectedLogs.add(logId);
+  } else {
+    selectedLogs.delete(logId);
+  }
+  
+  updateBulkActions();
+}
+
+// Toggle selecionar todos
+function toggleSelectAll() {
+  const selectAllCheckbox = document.getElementById('select-all-logs');
+  const logCheckboxes = document.querySelectorAll('.log-checkbox');
+  
+  logCheckboxes.forEach(checkbox => {
+    checkbox.checked = selectAllCheckbox.checked;
+    toggleLogSelection(checkbox);
+  });
+}
+
+// Atualizar ações em massa
+function updateBulkActions() {
+  const selectedCount = document.getElementById('selected-count');
+  const bulkDeleteBtn = document.getElementById('bulk-delete-btn');
+  const bulkExportBtn = document.getElementById('bulk-export-btn');
+  
+  if (selectedCount) {
+    selectedCount.textContent = selectedLogs.size;
+  }
+  
+  const hasSelection = selectedLogs.size > 0;
+  
+  if (bulkDeleteBtn) {
+    bulkDeleteBtn.disabled = !hasSelection;
+  }
+  
+  if (bulkExportBtn) {
+    bulkExportBtn.disabled = !hasSelection;
+  }
+}
+
+// Inicializar busca instantânea
+function initializeInstantSearch() {
+  const instantSearch = document.getElementById('instant_search');
+  
+  if (instantSearch) {
+    instantSearch.addEventListener('input', function() {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        performInstantSearch(this.value);
+      }, 300);
+    });
+  }
+}
+
+// Executar busca instantânea
+function performInstantSearch(query) {
+  const params = new URLSearchParams(window.location.search);
+  
+  if (query.trim()) {
+    params.set('instant_search', query);
+  } else {
+    params.delete('instant_search');
+  }
+  
+  window.location.href = '?' + params.toString();
+}
+
+// Função para bloquear IP
+window.blockIP = async function(ip) {
+  if (!ip || ip === 'Unknown') {
+    alert('❌ IP inválido ou desconhecido');
+    return;
+  }
+  
+  if (!confirm(`Tem certeza que deseja bloquear o IP ${ip}?`)) {
+    return;
+  }
+  
+  try {
+    const response = await fetch('/api/security/block-ip', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ 
+        ip_address: ip, 
+        reason: 'Bloqueado manualmente via painel de logs',
+        severity: 'high'
+      })
+    });
+    
+    const result = await response.json();
+    
+    if (response.ok && result.success) {
+      alert(`✅ IP ${ip} foi bloqueado com sucesso!`);
+      // Atualizar a página para refletir as mudanças
+      window.location.reload();
+    } else {
+      alert(`❌ Erro ao bloquear IP: ${result.error || result.message || 'Erro desconhecido'}`);
+    }
+  } catch (error) {
+    console.error('Erro ao bloquear IP:', error);
+    alert('❌ Erro ao bloquear IP. Verifique o console.');
+  }
+}
+
+// Inicializar botões de bloqueio de IP
+function initializeBlockIPButtons() {
+  const blockButtons = document.querySelectorAll('.btn-block-ip');
+  
+  blockButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const ip = this.dataset.ip;
+      blockIP(ip);
+    });
+  });
+}
+
+// Inicializar tudo quando a página carregar
+document.addEventListener('DOMContentLoaded', function() {
+  initializeFilters();
+  initializeQuickFilters();
+  initializeRealTimeSearch();
+  initializeCleanupButtons();
+  initializeBlockIPButtons();
+  initializeInstantSearch();
+});
+
+</script>

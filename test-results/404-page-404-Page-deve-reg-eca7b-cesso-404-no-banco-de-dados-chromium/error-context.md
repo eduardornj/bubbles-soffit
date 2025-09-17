@@ -1,0 +1,180 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - link "Skip to main content" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - link "Bubbles Enterprise" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - generic:
+            - img
+          - generic [ref=e12] [cursor=pointer]:
+            - generic [ref=e13] [cursor=pointer]: Bubbles
+            - generic [ref=e14] [cursor=pointer]: Enterprise
+        - navigation [ref=e15]:
+          - link "Home" [ref=e16] [cursor=pointer]:
+            - /url: /
+          - link "Services" [ref=e17] [cursor=pointer]:
+            - /url: /services
+          - link "About" [ref=e18] [cursor=pointer]:
+            - /url: /about
+          - link "Calculator" [ref=e19] [cursor=pointer]:
+            - /url: /calculator
+          - link "Certifications" [ref=e20] [cursor=pointer]:
+            - /url: /certifications
+          - link "Contact" [ref=e21] [cursor=pointer]:
+            - /url: /quote
+        - generic [ref=e22]:
+          - link "(407) 715-1790" [ref=e23] [cursor=pointer]:
+            - /url: tel:+1-407-715-1790
+          - link "Free Quote" [ref=e24] [cursor=pointer]:
+            - /url: /quote
+        - button "Toggle mobile menu" [ref=e25]:
+          - img
+      - navigation [ref=e29]:
+        - link "🏠 Home" [ref=e30] [cursor=pointer]:
+          - /url: /
+        - link "🔧 Services" [ref=e31] [cursor=pointer]:
+          - /url: /services
+        - link "ℹ️ About" [ref=e32] [cursor=pointer]:
+          - /url: /about
+        - link "🧮 Calculator" [ref=e33] [cursor=pointer]:
+          - /url: /calculator
+        - link "🏆 Certifications" [ref=e34] [cursor=pointer]:
+          - /url: /certifications
+        - link "📞 Contact" [ref=e35] [cursor=pointer]:
+          - /url: /quote
+        - generic [ref=e36]:
+          - link "📱 (407) 715-1790" [ref=e37] [cursor=pointer]:
+            - /url: tel:+1-407-715-1790
+          - link "✨ Get Free Quote" [ref=e39] [cursor=pointer]:
+            - /url: /quote
+  - main [ref=e40]:
+    - main [ref=e41]:
+      - generic [ref=e42]:
+        - img [ref=e45]
+        - generic [ref=e47]:
+          - heading "500" [level=1] [ref=e48]
+          - heading "Internal Server Error" [level=2] [ref=e49]
+          - paragraph [ref=e50]: We're experiencing technical difficulties on our end. Our team has been automatically notified and is working to resolve this issue.
+          - generic [ref=e51]:
+            - generic [ref=e52]:
+              - img [ref=e53]
+              - paragraph [ref=e55]: System Notice
+            - paragraph [ref=e56]: This error has been logged and our technical team has been notified. No sensitive information has been exposed.
+          - generic [ref=e57]:
+            - button "Try Again" [ref=e58]:
+              - img [ref=e59]
+              - generic [ref=e61]: Try Again
+            - link "Return Home" [ref=e62] [cursor=pointer]:
+              - /url: /
+              - img [ref=e63] [cursor=pointer]
+              - generic [ref=e65] [cursor=pointer]: Return Home
+        - generic [ref=e66]:
+          - heading "What Can You Do?" [level=3] [ref=e67]
+          - generic [ref=e68]:
+            - generic [ref=e69]:
+              - img [ref=e70]
+              - heading "Wait a Moment" [level=4] [ref=e72]
+              - paragraph [ref=e73]: The issue may be temporary. Try refreshing in a few minutes.
+            - generic [ref=e74]:
+              - img [ref=e75]
+              - heading "Call Us" [level=4] [ref=e77]
+              - paragraph [ref=e78]: Contact us at (407) 715-1790 for immediate assistance.
+            - generic [ref=e79]:
+              - img [ref=e80]
+              - heading "Email Support" [level=4] [ref=e82]
+              - paragraph [ref=e83]: Send us an email at contact@bubblesenterprise.com
+  - contentinfo [ref=e84]:
+    - generic [ref=e86]:
+      - generic [ref=e87]:
+        - generic [ref=e88]:
+          - generic:
+            - img
+          - generic [ref=e93]:
+            - generic [ref=e94]: Bubbles
+            - generic [ref=e95]: Enterprise
+        - paragraph [ref=e96]: Professional soffit and fascia specialists serving Orlando, FL and surrounding areas. Quality workmanship with guaranteed results for over 15 years.
+        - generic [ref=e97]:
+          - generic [ref=e98]:
+            - img [ref=e99]
+            - link "(407) 715-1790" [ref=e101] [cursor=pointer]:
+              - /url: tel:+1-407-715-1790
+          - generic [ref=e102]:
+            - img [ref=e103]
+            - link "contact@bubblesenterprise.com" [ref=e105] [cursor=pointer]:
+              - /url: mailto:contact@bubblesenterprise.com
+          - generic [ref=e106]:
+            - img [ref=e107]
+            - generic [ref=e110]:
+              - text: Orlando, FL
+              - text: Serving Central Florida
+      - generic [ref=e111]:
+        - heading "Services" [level=3] [ref=e112]
+        - list [ref=e113]:
+          - listitem [ref=e114]:
+            - link "New Construction" [ref=e115] [cursor=pointer]:
+              - /url: /services/new-construction
+          - listitem [ref=e116]:
+            - link "Remove & Replace" [ref=e117] [cursor=pointer]:
+              - /url: /services/remove-replace
+          - listitem [ref=e118]:
+            - link "Repairs" [ref=e119] [cursor=pointer]:
+              - /url: /services/repairs
+          - listitem [ref=e120]:
+            - link "Cost Calculator" [ref=e121] [cursor=pointer]:
+              - /url: /calculator
+      - generic [ref=e122]:
+        - heading "Company" [level=3] [ref=e123]
+        - list [ref=e124]:
+          - listitem [ref=e125]:
+            - link "About Us" [ref=e126] [cursor=pointer]:
+              - /url: /about
+          - listitem [ref=e127]:
+            - link "Orçamento" [ref=e128] [cursor=pointer]:
+              - /url: /quote
+          - listitem [ref=e129]:
+            - link "Testimonials" [ref=e130] [cursor=pointer]:
+              - /url: /testimonials
+          - listitem [ref=e131]:
+            - link "Contact" [ref=e132] [cursor=pointer]:
+              - /url: /quote
+          - listitem [ref=e133]:
+            - link "Free Quote" [ref=e134] [cursor=pointer]:
+              - /url: /quote
+    - generic [ref=e137]:
+      - generic [ref=e138]: © 2025 Bubbles Enterprise. All rights reserved.
+      - generic:
+        - link "Facebook":
+          - /url: "#"
+          - img
+        - link "Instagram":
+          - /url: "#"
+          - img
+        - link "LinkedIn":
+          - /url: "#"
+          - img
+      - generic [ref=e142]:
+        - link "Privacy Policy" [ref=e143] [cursor=pointer]:
+          - /url: /privacy
+        - link "Terms of Service" [ref=e144] [cursor=pointer]:
+          - /url: /terms
+  - generic [ref=e147]:
+    - button "Menu" [ref=e148]:
+      - img [ref=e150]
+      - generic: Menu
+    - button "Inspect" [ref=e154]:
+      - img [ref=e156]
+      - generic: Inspect
+    - button "Audit" [ref=e158]:
+      - generic [ref=e159]:
+        - img [ref=e160]
+        - img [ref=e163]
+      - generic: Audit
+    - button "Settings" [ref=e166]:
+      - img [ref=e168]
+      - generic: Settings
+```

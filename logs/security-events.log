@@ -1,0 +1,7 @@
+{
+  "message": "Security events log initialized",
+  "timestamp": "2025-01-16T14:43:00Z",
+  "event_type": "system_init",
+  "severity": "info"
+}
+{"type":"suspicious_404","severity":"medium","clientIP":"Unknown","userAgent":"Unknown","message":"Suspicious 404 attempt: Admin Panel Scan","details":{"url":"/admin/login","referer":"Direct","method":"GET","suspiciousType":"Admin Panel Scan","patterns":["/\\/admin/i","/\\/(login|signin)$/i"]},"timestamp":"2025-09-16T21:35:42.188Z"}

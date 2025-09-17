@@ -1,0 +1,267 @@
+---
+// Security Charts Component
+// Provides interactive charts for security monitoring dashboard
+---
+
+<div class="security-charts">
+  <!-- Error Types Chart -->
+  <div class="chart-container mb-8">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">📊 Tipos de Erro</h3>
+      <div class="relative h-64">
+        <canvas id="errorTypesChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Daily Trend Chart -->
+  <div class="chart-container mb-8">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">📈 Tendência Diária</h3>
+      <div class="relative h-64">
+        <canvas id="dailyTrendChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top IPs Chart -->
+  <div class="chart-container mb-8">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">🌐 IPs com Mais Erros</h3>
+      <div class="relative h-64">
+        <canvas id="topIPsChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- CSP Violations Chart -->
+  <div class="chart-container mb-8">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">🛡️ Violações CSP</h3>
+      <div class="relative h-64">
+        <canvas id="cspViolationsChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Import Chart.js from CDN
+  const script = document.createElement('script');
+  script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+  script.onload = initializeCharts;
+  document.head.appendChild(script);
+
+  let charts = {};
+
+  function initializeCharts() {
+    // Initialize all charts
+    initErrorTypesChart();
+    initDailyTrendChart();
+    initTopIPsChart();
+    initCSPViolationsChart();
+  }
+
+  function initErrorTypesChart() {
+    const ctx = document.getElementById('errorTypesChart');
+    if (!ctx) return;
+
+    charts.errorTypes = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: [],
+        datasets: [{
+          data: [],
+          backgroundColor: [
+            '#ef4444', '#f97316', '#eab308', '#22c55e', 
+            '#3b82f6', '#8b5cf6', '#ec4899', '#6b7280'
+          ],
+          borderWidth: 2,
+          borderColor: '#ffffff'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'right'
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const label = context.label || '';
+                const value = context.parsed || 0;
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const percentage = ((value / total) * 100).toFixed(1);
+                return `${label}: ${value} (${percentage}%)`;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  function initDailyTrendChart() {
+    const ctx = document.getElementById('dailyTrendChart');
+    if (!ctx) return;
+
+    charts.dailyTrend = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Erros por Dia',
+          data: [],
+          borderColor: '#ef4444',
+          backgroundColor: 'rgba(239, 68, 68, 0.1)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1
+            }
+          },
+          x: {
+            ticks: {
+              maxTicksLimit: 7
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            display: false
+          }
+        }
+      }
+    });
+  }
+
+  function initTopIPsChart() {
+    const ctx = document.getElementById('topIPsChart');
+    if (!ctx) return;
+
+    charts.topIPs = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Número de Erros',
+          data: [],
+          backgroundColor: '#3b82f6',
+          borderColor: '#1d4ed8',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        indexAxis: 'y',
+        scales: {
+          x: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            display: false
+          }
+        }
+      }
+    });
+  }
+
+  function initCSPViolationsChart() {
+    const ctx = document.getElementById('cspViolationsChart');
+    if (!ctx) return;
+
+    charts.cspViolations = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Violações CSP',
+          data: [],
+          backgroundColor: '#8b5cf6',
+          borderColor: '#7c3aed',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            display: false
+          }
+        }
+      }
+    });
+  }
+
+  // Function to update charts with new data
+  function updateCharts(errorData, cspData) {
+    // Update Error Types Chart
+    if (charts.errorTypes && errorData.stats.errorTypes) {
+      charts.errorTypes.data.labels = errorData.stats.errorTypes.map(item => `${item.code}`);
+      charts.errorTypes.data.datasets[0].data = errorData.stats.errorTypes.map(item => item.count);
+      charts.errorTypes.update();
+    }
+
+    // Update Daily Trend Chart
+    if (charts.dailyTrend && errorData.stats.dailyTrend) {
+      charts.dailyTrend.data.labels = errorData.stats.dailyTrend.map(item => 
+        new Date(item.date).toLocaleDateString('pt-BR', { month: 'short', day: 'numeric' })
+      );
+      charts.dailyTrend.data.datasets[0].data = errorData.stats.dailyTrend.map(item => item.count);
+      charts.dailyTrend.update();
+    }
+
+    // Update Top IPs Chart
+    if (charts.topIPs && errorData.stats.topIPs) {
+      charts.topIPs.data.labels = errorData.stats.topIPs.map(item => item.ip);
+      charts.topIPs.data.datasets[0].data = errorData.stats.topIPs.map(item => item.count);
+      charts.topIPs.update();
+    }
+
+    // Update CSP Violations Chart
+    if (charts.cspViolations && cspData.stats.topDirectives) {
+      charts.cspViolations.data.labels = cspData.stats.topDirectives.map(item => item.directive);
+      charts.cspViolations.data.datasets[0].data = cspData.stats.topDirectives.map(item => item.count);
+      charts.cspViolations.update();
+    }
+  }
+
+  // Make updateCharts available globally
+  window.updateSecurityCharts = updateCharts;
+</script>
+
+<style>
+  .chart-container {
+    position: relative;
+  }
+  
+  .chart-container canvas {
+    max-height: 300px;
+  }
+</style>

@@ -1,0 +1,1 @@
+import"./hoisted.DV8WBEkX.js";if(window.location.search||window.location.hash){const t=new URL(window.location);t.search="",t.hash="",window.history.replaceState({},document.title,t.pathname)}"credentials"in navigator&&navigator.credentials.preventSilentAccess();

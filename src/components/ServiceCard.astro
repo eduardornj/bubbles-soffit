@@ -1,0 +1,156 @@
+---
+export interface Props {
+  title: string;
+  description: string;
+  features: string[];
+  image?: string;
+  href?: string;
+  variant?: 'default' | 'featured';
+  icon?: string;
+}
+
+const { 
+  title, 
+  description, 
+  features, 
+  image, 
+  href = '#', 
+  variant = 'default',
+  icon 
+} = Astro.props;
+
+const cardClasses = variant === 'featured' 
+  ? 'bg-gradient-to-br from-bubble-blue to-bubble-dark text-white transform scale-105 shadow-2xl' 
+  : 'bg-white hover:shadow-xl';
+---
+
+<div class={`rounded-xl p-6 lg:p-8 transition-all duration-300 hover:-translate-y-2 ${cardClasses}`}>
+  <!-- Icon or Image -->
+  {icon ? (
+    <div class="mb-6">
+      <div class={`w-16 h-16 rounded-lg flex items-center justify-center ${
+        variant === 'featured' ? 'bg-white/20' : 'bg-bubble-light/10'
+      }`}>
+        <Fragment set:html={icon} />
+      </div>
+    </div>
+  ) : image && (
+    <div class="mb-6 overflow-hidden rounded-lg">
+      <img 
+        src={image} 
+        alt={title}
+        class="w-full h-48 object-cover transition-transform duration-300 hover:scale-110"
+        loading="lazy"
+      />
+    </div>
+  )}
+  
+  <!-- Content -->
+  <div class="space-y-4">
+    <h3 class={`text-xl lg:text-2xl font-bold ${
+      variant === 'featured' ? 'text-white' : 'text-neutral-gray-900'
+    }`}>
+      {title}
+    </h3>
+    
+    <p class={`text-base lg:text-lg leading-relaxed ${
+      variant === 'featured' ? 'text-white/90' : 'text-neutral-gray-600'
+    }`}>
+      {description}
+    </p>
+    
+    <!-- Features List -->
+    {features.length > 0 && (
+      <ul class="space-y-2">
+        {features.map(feature => (
+          <li class={`flex items-start space-x-3 ${
+            variant === 'featured' ? 'text-white/90' : 'text-neutral-gray-600'
+          }`}>
+            <svg 
+              class={`w-5 h-5 mt-0.5 flex-shrink-0 ${
+                variant === 'featured' ? 'text-bubble-light' : 'text-bubble-primary'
+              }`} 
+              fill="currentColor" 
+              viewBox="0 0 20 20"
+            >
+              <path 
+                fill-rule="evenodd" 
+                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" 
+                clip-rule="evenodd"
+              />
+            </svg>
+            <span>{feature}</span>
+          </li>
+        ))}
+      </ul>
+    )}
+    
+    <!-- CTA Button -->
+    <div class="pt-4">
+      {title === 'Repairs & Maintenance' ? (
+        <button 
+          onclick="openServiceModal('repair')"
+          class={`inline-flex items-center justify-center w-full px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
+            variant === 'featured' 
+              ? 'bg-white text-bubble-primary hover:bg-bubble-light hover:text-white shadow-lg'
+              : 'bg-bubble-primary text-white hover:bg-bubble-secondary shadow-lg hover:shadow-xl'
+          }`}
+        >
+          <span>🔧 Get Your Repair Now</span>
+        </button>
+      ) : title === 'Remove & Replace' ? (
+        <button 
+          onclick="openServiceModal('remove-replace')"
+          class={`inline-flex items-center justify-center w-full px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
+            variant === 'featured' 
+              ? 'bg-white text-bubble-primary hover:bg-bubble-light hover:text-white shadow-lg'
+              : 'bg-bubble-primary text-white hover:bg-bubble-secondary shadow-lg hover:shadow-xl'
+          }`}
+        >
+          <span>🏠 Request Quote</span>
+        </button>
+      ) : title === 'New Construction' ? (
+        <button 
+          onclick="openServiceModal('new-construction')"
+          class={`inline-flex items-center justify-center w-full px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
+            variant === 'featured' 
+              ? 'bg-white text-bubble-primary hover:bg-bubble-light hover:text-white shadow-lg'
+              : 'bg-bubble-primary text-white hover:bg-bubble-secondary shadow-lg hover:shadow-xl'
+          }`}
+        >
+          <span>🏗️ Construction Quote</span>
+        </button>
+      ) : (
+        <a 
+          href={href} 
+          class={`inline-flex items-center space-x-2 font-semibold transition-all duration-200 ${
+            variant === 'featured' 
+              ? 'text-white hover:text-bubble-light border-b-2 border-white/30 hover:border-bubble-light pb-1'
+              : 'text-bubble-primary hover:text-bubble-secondary border-b-2 border-bubble-primary/30 hover:border-bubble-secondary pb-1'
+          }`}
+        >
+          <span>Learn More</span>
+          <svg class="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </a>
+      )}
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Hover effects */
+  .service-card:hover {
+    transform: translateY(-8px);
+  }
+  
+  /* Featured card glow effect */
+  .service-card.featured {
+    box-shadow: 0 25px 50px -12px rgba(59, 130, 246, 0.25);
+  }
+  
+  .service-card.featured:hover {
+    box-shadow: 0 25px 50px -12px rgba(59, 130, 246, 0.4);
+  }
+</style>

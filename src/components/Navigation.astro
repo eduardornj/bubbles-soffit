@@ -1,0 +1,146 @@
+---
+export interface Props {
+  variant?: 'horizontal' | 'vertical';
+  theme?: 'light' | 'dark' | 'transparent';
+  showCTA?: boolean;
+}
+
+const { 
+  variant = 'horizontal', 
+  theme = 'light',
+  showCTA = true 
+} = Astro.props;
+
+const navItems = [
+  { href: '/', label: 'Home' },
+  { href: '/services', label: 'Services' },
+  { href: '/about', label: 'About' },
+  { href: '/calculator', label: 'Calculator' },
+  { href: '/quote', label: 'Contact' }
+];
+
+const getThemeClasses = () => {
+  switch (theme) {
+    case 'dark':
+      return {
+        text: 'text-white',
+        hover: 'hover:text-bubble-light',
+        phone: 'text-neutral-gray-300'
+      };
+    case 'transparent':
+      return {
+        text: 'text-white',
+        hover: 'hover:text-bubble-light',
+        phone: 'text-white'
+      };
+    default:
+      return {
+        text: 'text-neutral-gray-700',
+        hover: 'hover:text-bubble-primary',
+        phone: 'text-neutral-gray-700'
+      };
+  }
+};
+
+const themeClasses = getThemeClasses();
+---
+
+{variant === 'horizontal' ? (
+  <!-- Horizontal Navigation -->
+  <nav class="flex items-center space-x-8">
+    {navItems.map(item => (
+      <a 
+        href={item.href} 
+        class={`font-medium transition-colors duration-200 ${themeClasses.text} ${themeClasses.hover}`}
+      >
+        {item.label}
+      </a>
+    ))}
+    
+    {showCTA && (
+      <div class="flex items-center space-x-4 ml-8">
+        <a 
+          href="tel:+1-407-715-1790" 
+          class={`font-medium transition-colors duration-200 ${themeClasses.phone} ${themeClasses.hover}`}
+        >
+          (407) 715-1790
+        </a>
+        <a href="/quote" class="btn-primary">
+          Free Quote
+        </a>
+      </div>
+    )}
+  </nav>
+) : (
+  <!-- Vertical Navigation -->
+  <nav class="flex flex-col space-y-4">
+    {navItems.map(item => (
+      <a 
+        href={item.href} 
+        class={`font-medium transition-colors duration-200 ${themeClasses.text} ${themeClasses.hover}`}
+      >
+        {item.label}
+      </a>
+    ))}
+    
+    {showCTA && (
+      <div class="pt-4 border-t border-current border-opacity-20">
+        <a 
+          href="tel:+1-407-715-1790" 
+          class={`block font-medium mb-3 ${themeClasses.phone}`}
+        >
+          (407) 715-1790
+        </a>
+        <a href="/quote" class="btn-primary inline-block">
+          Free Quote
+        </a>
+      </div>
+    )}
+  </nav>
+)}
+
+<style>
+  /* Active link styling */
+  nav a[aria-current="page"] {
+    @apply text-bubble-primary font-semibold;
+  }
+  
+  /* Dark theme active link */
+  .theme-dark nav a[aria-current="page"],
+  .theme-transparent nav a[aria-current="page"] {
+    @apply text-bubble-light;
+  }
+</style>
+
+<script>
+  // Register navigation script for lazy loading
+  if (typeof window !== 'undefined' && window.LazyScriptLoader) {
+    window.LazyScriptLoader.registerScript('navigation', {
+      priority: 'idle',
+      callback: function() {
+        const currentPath = window.location.pathname;
+        const navLinks = document.querySelectorAll('nav a[href]');
+        
+        navLinks.forEach(link => {
+          const href = link.getAttribute('href');
+          if (href === currentPath || (currentPath === '/' && href === '/')) {
+            link.setAttribute('aria-current', 'page');
+          }
+        });
+      }
+    });
+  } else {
+    // Fallback for when lazy loader is not available
+    document.addEventListener('DOMContentLoaded', function() {
+      const currentPath = window.location.pathname;
+      const navLinks = document.querySelectorAll('nav a[href]');
+      
+      navLinks.forEach(link => {
+        const href = link.getAttribute('href');
+        if (href === currentPath || (currentPath === '/' && href === '/')) {
+          link.setAttribute('aria-current', 'page');
+        }
+      });
+    });
+  }
+</script>
